@@ -40,4 +40,27 @@ public class Liga implements Competidor {
 	public void setCompetidores(List<Competidor> competidores) {
 		this.competidores = competidores;
 	}
+	
+	public boolean isTipoCompetidor() {
+		return tipoCompetidor;
+	}
+	
+	public Liga(String nombreLiga, List<Competidor> competidores, boolean tipoCompetidor) {
+		super();
+		this.nombreLiga = nombreLiga;
+		this.competidores = competidores;
+		this.tipoCompetidor = tipoCompetidor;
+	}
+
+	@Override
+	public String toString() {
+	
+		StringBuilder sb = new StringBuilder();
+		sb.append("Nombre Liga = "+this.nombreLiga+";");
+		for ( Competidor c : competidores) {
+			Personaje pj = (Personaje) c;
+			sb.append(pj.getNombreFantasia() +";");
+		}
+		return sb.toString();
+	}
 }

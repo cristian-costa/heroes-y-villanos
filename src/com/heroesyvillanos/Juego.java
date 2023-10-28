@@ -1,11 +1,18 @@
 package com.heroesyvillanos;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Juego {
-	private List<Personaje> personajes;
-	private List<Liga> ligas;
+	private ArrayList<Personaje> personajes;
+	private ArrayList <Liga> ligas;
 	private Ordenamiento ordenamiento;
     private Scanner scanner = new Scanner(System.in);
     
@@ -65,7 +72,14 @@ public class Juego {
 
             switch (seleccion) {
                 case 1:
-                    cargarPersonajesDesdeArchivo();
+                	try {
+                		this.personajes = cargarPersonajesDesdeArchivo("src/personajes.in");
+                	}catch (FileNotFoundException e) {
+						// manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
+					}catch (IOException e) {
+						// Este por si falla la lectura del archvo  
+					}
+                    
                     break;
                 case 2:
                     crearPersonaje();
@@ -85,10 +99,54 @@ public class Juego {
         }
     }
         
-	public void cargarPersonajesDesdeArchivo() {
-        System.out.println("");
-		System.out.println("Cargando personajes desde archivo...");
-	}
+	public ArrayList<Personaje> cargarPersonajesDesdeArchivo(String path) throws IOException {
+		
+		 
+		 ArrayList<Personaje> listaPersonaje = new ArrayList<Personaje>();
+
+	        try (
+	       
+	        	BufferedReader br = new BufferedReader(new FileReader(path))) {
+	            String line;	            
+	            line = br.readLine();//leo la cabacera para ignorarla
+	            boolean heovi = false;
+	            while ((line = br.readLine()) != null) {
+	            	    	
+	            	String[] atributos = line.split(",");
+	            	Map<Caracteristica, Integer> caract = new HashMap<Caracteristica, Integer>();
+	            	
+	            	caract.put(Caracteristica.VELOCIDAD, 	Integer.valueOf(atributos[3].trim()));
+	            	caract.put(Caracteristica.FUERZA, 		Integer.valueOf(atributos[4].trim()));
+	            	caract.put(Caracteristica.RESISTENCIA, 	Integer.valueOf(atributos[5].trim()));
+	            	caract.put(Caracteristica.DESTREZA, 	Integer.valueOf(atributos[6].trim()));
+	            	
+	            	
+	            	
+	            	if (atributos[0].equals("Héroe")) {
+	            		heovi = true;
+	            	}else if(atributos[0].equals("Villano")) {
+	            		heovi = false;
+	            	}else {
+	            		System.err.println("NO EXISTE TIPO DE PARTICIPANTE");
+	            		return null; 
+	            	}
+	            	
+	            	
+	            	Personaje p = new Personaje(atributos[1], atributos[2], caract,heovi);
+	            	
+	            	listaPersonaje.add(p);
+	            }
+	            br.close();
+	            
+	        }catch (FileNotFoundException e) {	        	
+	        	throw new FileNotFoundException("No se pudo encontrar el archivo: " + path);
+				        	
+	        }catch (IOException e) {
+	        	throw new IOException("Error al leer o escribir el archivo");
+	        }
+	        
+	        return listaPersonaje;
+		}
 	
 	public void crearPersonaje() {
         System.out.println("");
@@ -126,7 +184,14 @@ public class Juego {
 
             switch (seleccion) {
                 case 1:
-                    cargarLigasDesdeArchivo();
+                	try {
+                		this.ligas = cargarLigasDesdeArchivo(this.personajes, "src/personajes.in");
+            		}catch (FileNotFoundException e) {
+            			// manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
+            		}catch (IOException e) {
+            			// Este por si falla la lectura del archvo  
+            		}
+            
                     break;
                 case 2:
                     crearLiga();
@@ -146,10 +211,55 @@ public class Juego {
         }
     }
     
-	public void cargarLigasDesdeArchivo() {
-        System.out.println("");
-		System.out.println("Cargando ligas desde archivo...");
+	public ArrayList<Liga> cargarLigasDesdeArchivo(ArrayList<Personaje>listPersonaje, String path) throws IOException {
+		
+		ArrayList<Liga> listaLiga = new ArrayList<Liga>();
+        try (
+       
+        	BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            boolean heovi = false;
+            while ((line = br.readLine()) != null) {
+            	    	
+            	ArrayList<Competidor> competidores = new ArrayList<Competidor>();          	
+            	String[] ligaString = line.split(",");
+            	
+            	for (String personajeNombre : ligaString) {
+            		
+            		//agrego los personaje
+            		for (Personaje per : listPersonaje) {						
+						
+						if(per.getNombreFantasia().trim().equals(personajeNombre.trim() )) {
+							heovi=per.isTipoCompetidor();
+							competidores.add(per);
+						}
+												
+					}
+            		//agrego las ligas
+            		for(Liga lig : listaLiga) {
+            			if(lig.getNombreLiga().trim().equals(personajeNombre.trim() )) {
+            				heovi=lig.isTipoCompetidor();
+							competidores.add(lig);
+						}
+            		}
+				}
+            	
+            	if(!competidores.isEmpty()) {
+            		listaLiga.add(new Liga(ligaString[0], competidores,heovi));
+            	}          
+            }
+            
+        }catch (FileNotFoundException e) {	        	
+        	throw new FileNotFoundException("No se pudo encontrar el archivo: "+ path);
+			        	
+        }catch (IOException e) {
+        	throw new IOException("Error al leer o escribir el archivo");
+        }
+        
+		return listaLiga;
 	}
+	
+	
 	
 	public void crearLiga() {
         System.out.println("");

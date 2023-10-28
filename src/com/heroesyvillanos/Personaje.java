@@ -2,18 +2,23 @@ package com.heroesyvillanos;
 
 import java.util.Map;
 
+
 public class Personaje extends Competidor {
 	private String nombre;
 	private String nombreFantasia;
 	private Map<Caracteristica, Integer> caracteristicas;
 	
-	Personaje(String nombre, String nombreFantasia, Map<Caracteristica, Integer> caracteristicas) throws Exception{
+	Personaje(String nombre, String nombreFantasia, Map<Caracteristica, Integer> caracteristicas) throws IllegalArgumentException{
 		if(!esNombreValido(nombre)) {
-			throw new Exception("Nombre invalido");
+			throw new IllegalArgumentException("Nombre invalido");
 		}
 		
 		if(!esNombreValido(nombreFantasia)) {
-			throw new Exception("Nombre fantasia invalido");
+			throw new IllegalArgumentException("Nombre fantasia invalido");
+		}
+		
+		if(caracteristicas.size() < Caracteristica.values().length) {
+			throw new IllegalArgumentException("Faltan valores para alguna/s caracteristica");
 		}
 		
 		this.nombre = nombre;

@@ -1,11 +1,14 @@
 package com.heroesyvillanos;
 
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Juego {
-	private List<Personaje> personajes;
-	private List<Liga> ligas;
+	private List<Personaje> personajes = new ArrayList<>();
+	private List<Liga> ligas = new ArrayList<>();
 	private Ordenamiento ordenamiento;
     private Scanner scanner = new Scanner(System.in);
     
@@ -71,7 +74,11 @@ public class Juego {
                     crearPersonaje();
                     break;
                 case 3:
-                    listarPersonajes();
+					try {
+						listarPersonajes();
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
+					}
                     break;
                 case 4:
                     guardarPersonajesEnArchivo();
@@ -91,13 +98,77 @@ public class Juego {
 	}
 	
 	public void crearPersonaje() {
+		boolean seguir;
+		String nombreFantasia = "";
+		String nombreReal = "";
+		Map<Caracteristica, Integer> mapCaracteristicas = new HashMap<>();;
+		
         System.out.println("");
 		System.out.println("Creando personaje...");
+		System.out.println("Ingrese nombre de fantasía: ");
+		seguir = true;
+		scanner.nextLine(); //consumir enter pendiente de nextInt()
+		while (seguir) {
+			seguir = false;
+			nombreFantasia = scanner.nextLine();
+			
+			if (!personajes.isEmpty()) {
+				for (Personaje personaje : personajes) {
+				    if (personaje.getNombreFantasia().equals(nombreFantasia)) {
+				    	System.out.println("Personaje ya existente, ingrese nuevamente: ");
+				    	seguir = true;
+				        break;
+				    }
+				}
+			}
+		}
+		
+		System.out.println("");
+		System.out.println("Ingrese nombre real: ");
+		
+//		seguir = true;
+//		while (seguir = true) {
+//			seguir = false;
+			nombreReal = scanner.nextLine();
+//		}
+			
+		System.out.println("");
+		System.out.println("Ingrese valores para las características: ");
+		
+		Caracteristica[] caracteristicas = Caracteristica.values();
+		
+		
+    	for(int i = 0; i < caracteristicas.length; i++) {
+    		
+    		System.out.println((i + 1) + ". " + caracteristicas[i] + " valor: ");
+    		seguir = true;
+    		
+    		while (seguir) {
+    			int valor = scanner.nextInt();
+    			if (valor > 0) {
+    				seguir = false;
+    				mapCaracteristicas.put(caracteristicas[i], valor);
+    			} else {
+    				System.out.println("Valor incorrecto, intente nuevamente: ");
+    			}
+    		}
+    	}
+    	
+    	personajes.add(new Personaje(nombreReal, nombreFantasia, mapCaracteristicas));
+		
 	}
 	
-	public void listarPersonajes() {
-        System.out.println("");
-		System.out.println("Listando personajes...");
+	public void listarPersonajes() throws Exception {
+		if (!personajes.isEmpty()) {
+			System.out.println("");
+			System.out.println("Listando personajes...");
+			for (int i = 0; i < personajes.size(); i++) {
+				System.out.println((i+1) + ". " + personajes.get(i));
+			}
+		} else {
+			throw new Exception("La lista de personajes está vacía."); 
+		}
+		
 	}
 	
 	public void guardarPersonajesEnArchivo() {
@@ -132,7 +203,11 @@ public class Juego {
                     crearLiga();
                     break;
                 case 3:
-                    listarLigas();
+					try {
+						listarLigas();
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
+					}
                     break;
                 case 4:
                     guardarLigasEnArchivo();
@@ -156,9 +231,17 @@ public class Juego {
 		System.out.println("Creando liga...");
 	}
 	
-	public void listarLigas() {
-        System.out.println("");
-		System.out.println("Listando ligas...");
+	public void listarLigas() throws Exception{
+		if(!ligas.isEmpty()) {
+			System.out.println("");
+			System.out.println("Listando ligas...");
+			for (int i = 0; i < ligas.size(); i++) {
+				System.out.println((i+1) + ". " + ligas.get(i));
+			}
+		} else {
+			throw new Exception("La lista de ligas está vacía."); 
+		}
+		
 	}
 	
 	public void guardarLigasEnArchivo() {
@@ -175,9 +258,9 @@ public class Juego {
 
         while (seguir) {
             System.out.println("");
-            System.out.println("===== Realización de Combates =====");
-            System.out.println("1. Personaje contra Liga");
-            System.out.println("2. Liga contra Liga");
+            System.out.println("===== Combates =====");
+            System.out.println("1. Realizar combate");
+            System.out.println("2. Ver reglas de combate");
             System.out.println("3. Regresar al Menú Principal");
             System.out.print("Seleccione una opción: ");
 
@@ -185,12 +268,10 @@ public class Juego {
 
             switch (seleccion) {
                 case 1:
-                	// Personaje contra liga
-                	realizarCombate();
+                	realizarCombateMenu();
                     break;
                 case 2:
-                	// Liga contra liga
-                	realizarCombate();
+                	mostrarReglas();
                     break;
                 case 3:
                     seguir = false;
@@ -201,10 +282,135 @@ public class Juego {
         }
     }
     
-	public void realizarCombate() {
+    public void realizarCombateMenu() {
+    	try {
+    		System.out.println("");
+    		System.out.println("Elegir primer competidor:");
+        	Competidor comp1 = seleccionarCompetidor();
+        	System.out.println("");
+    		System.out.println("Elegir segundo competidor:");
+        	Competidor comp2 = seleccionarCompetidor();
+        	Caracteristica car = seleccionarCaracteristica();
+        	
+        	combatir(comp1, comp2, car);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+			System.out.println("Regresando al menú de combates");
+		}
+    	
+    }
+    
+    public Competidor seleccionarCompetidor() throws Exception {
+    	boolean seguir = true;
+    	int seleccionTipoCompetidor = 0;
+    	int seleccionCompetidor = 0;
+
+        while (seguir) {
+            System.out.println("1. Personaje");
+            System.out.println("2. Liga");
+            System.out.print("Seleccione una opción: ");
+            
+            seleccionTipoCompetidor = scanner.nextInt();
+
+            switch (seleccionTipoCompetidor) {
+                case 1:
+                	listarPersonajes();
+                	seguir = false;
+                    break;
+                case 2:
+                	listarLigas();
+                	seguir = false;
+                    break;
+                default:
+                    System.out.println("Opción no válida. Intente de nuevo.");
+            }
+        }
+        
+        seguir = true;
+        
+        while (seguir) {
+        	System.out.print("Seleccione una opción: ");
+        	
+        	seleccionCompetidor = scanner.nextInt();
+        	
+        	if ((seleccionTipoCompetidor == 1 && //Personaje
+        			(seleccionCompetidor < 1 || seleccionCompetidor > personajes.size())) || //Fuera de rango personaje
+        		(seleccionTipoCompetidor == 2 && //Liga
+        			(seleccionCompetidor < 1 || seleccionCompetidor > ligas.size()))) { //Fuera de rango liga
+        		System.out.println("Opción no válida. Intente de nuevo.");
+        	}
+        	else {
+        		seguir = false;
+        	}
+        }        
+        
+        System.out.println("Elegiste: " + (seleccionTipoCompetidor == 1 ? personajes.get(seleccionCompetidor - 1) : ligas.get(seleccionCompetidor - 1)));
+        return seleccionTipoCompetidor == 1 ? personajes.get(seleccionCompetidor - 1) : ligas.get(seleccionCompetidor - 1);
+    }
+    
+    public Caracteristica seleccionarCaracteristica() {
+    	System.out.println("Características: ");
+    	Caracteristica[] caracteristicas = Caracteristica.values();
+    	int seleccion = 0;
+    	listarCaracteristicas();
+    	System.out.println("");
+		System.out.println("Ingresar opción de característica elegida: ");
+		boolean seguir = true;
+
+        while (seguir) {
+        	seleccion = scanner.nextInt();
+        	
+        	if(seleccion < 0 || seleccion > caracteristicas.length) {
+        		System.out.println("Opción no válida. Intente de nuevo.");
+        	} else {
+        		seguir = false;
+        	}
+        }
+        
+        System.out.println("Elegiste: " + caracteristicas[seleccion - 1]);
+        return caracteristicas[seleccion - 1];
+    	
+    }
+    
+    public void listarCaracteristicas() {
+    	Caracteristica[] caracteristicas = Caracteristica.values();
+    	for(int i = 0; i < caracteristicas.length; i++) {
+    		System.out.println((i + 1) + ". " + caracteristicas[i]);
+    	}
+    }
+    
+	public void combatir(Competidor c1, Competidor c2, Caracteristica car) {
 		// Toma dos competidores y una caracteristica
+		System.out.println("");
+		System.out.println("Combatiendo...");
+		int resultado = c1.esGanador(c2, car);
+		
+		if (resultado > 0) {
+			System.out.println("El ganador es: " + c1);
+		} else if (resultado < 0) {
+			System.out.println("El ganador es: " + c2);
+		} else {
+			System.out.println("La pelea termina en empate" );
+		}
+        
+	}
+	
+	public void mostrarReglas() {
         System.out.println("");
-		System.out.println("Realizando combate...");
+		System.out.println("===== Reglas de combate =====");
+		System.out.println("Para decidir quién es el ganador en un combate entre dos competidores se utiliza el valor de una de");
+		System.out.println("las características. En caso de empate, se decide por el valor de otra característica (en el orden ");
+		System.out.println("establecido, y volviendo a comenzar si fuera necesario).");
+		System.out.println("Por ejemplo: Si dos contendientes decidieran competir por Fuerza, y empatan, definen por ");
+		System.out.println("Resistencia. Si hubiera otro empate, definen por Destreza. Ante otro empate, definen por");
+		System.out.println("Velocidad. Si resulta en empate, será empate finalmente.");
+		System.out.println("El orden es:");
+		listarCaracteristicas();
+		System.out.println("Pueden enfrentarse personajes contra personajes, personajes contra ligas, o ligas contra ligas.");
+		System.out.println("Cuando se trata de una liga, el valor de cada característica se determina como el promedio de los ");
+		System.out.println("valores de esa característica entre todos los personajes que componen la liga.");
+
 	}
     
 	// ========== FIN MENU COMBATES ==========

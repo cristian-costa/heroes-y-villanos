@@ -2,55 +2,52 @@ package com.heroesyvillanos;
 
 import java.util.Map;
 
-public class Personaje implements Competidor {
+
+public class Personaje extends Competidor {
 	private String nombre;
 	private String nombreFantasia;
 	private Map<Caracteristica, Integer> caracteristicas;
-	private boolean tipoCompetidor; //true para heroe, false para villano, esto se deberia cambiar por otra variable.
-
-	// Getters y Setters
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
+	
+	Personaje(String nombre, String nombreFantasia, Map<Caracteristica, Integer> caracteristicas) throws IllegalArgumentException{
+		if(!esNombreValido(nombre)) {
+			throw new IllegalArgumentException("Nombre invalido");
+		}
+		
+		if(!esNombreValido(nombreFantasia)) {
+			throw new IllegalArgumentException("Nombre fantasia invalido");
+		}
+		
+		if(caracteristicas.size() < Caracteristica.values().length) {
+			throw new IllegalArgumentException("Faltan valores para alguna/s caracteristica");
+		}
+		
 		this.nombre = nombre;
-	}
-
-	public String getNombreFantasia() {
-		return nombreFantasia;
-	}
-
-	public void setNombreFantasia(String nombreFantasia) {
 		this.nombreFantasia = nombreFantasia;
-	}
-
-	public Map<Caracteristica, Integer> getCaracteristicas() {
-		return caracteristicas;
-	}
-
-	public void setCaracteristicas(Map<Caracteristica, Integer> caracteristicas) {
 		this.caracteristicas = caracteristicas;
+		estaDentroDeLiga = false;
 	}
-
-	public boolean isTipoCompetidor() {
-		return tipoCompetidor;
-	}
-
-	public void setTipoCompetidor(boolean tipoCompetidor) {
-		this.tipoCompetidor = tipoCompetidor;
-	}
-
+	
 	@Override
 	public int getPromedioCaracteristica(Caracteristica c) {
-		// Obtiene valor promedio
-		return 0;
+		return caracteristicas.get(c);
+	}
+	
+	@Override
+	protected int getSumaCaracteristica(Caracteristica c) {
+		return caracteristicas.get(c);
 	}
 
 	@Override
-	public boolean esGanador(Competidor competidor, Caracteristica c) {
-		// Determina si el personaje es ganador contra otro competidor basandose en una caracteristica especifica. 
-		// Ojo que si da empate se usa la caracteristica que sigue.		
-		return false;
+	protected int getCantidadCompetidores() {
+		return 1;
+	}
+	
+	@Override
+	public String toString() {
+		return nombre + ", " + nombreFantasia;
+	}
+	
+	public String getNombreFantasia() {
+		return nombreFantasia;
 	}
 }

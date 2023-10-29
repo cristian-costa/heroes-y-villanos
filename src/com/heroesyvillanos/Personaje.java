@@ -1,8 +1,9 @@
 package com.heroesyvillanos;
 
+import java.util.Comparator;
 import java.util.Map;
 
-public class Personaje implements Competidor {
+public class Personaje implements Competidor, Comparable<Competidor> {
 	private String nombre;
 	private String nombreFantasia;
 	private Map<Caracteristica, Integer> caracteristicas;
@@ -49,8 +50,27 @@ public class Personaje implements Competidor {
 
 	@Override
 	public boolean esGanador(Competidor competidor, Caracteristica c) {
+		boolean resultado = false;
 		// Determina si el personaje es ganador contra otro competidor basandose en una caracteristica especifica. 
-		// Ojo que si da empate se usa la caracteristica que sigue.		
-		return false;
+		// Ojo que si da empate se usa la caracteristica que sigue.
+		new Ordenamiento().compararPor(c);
+		resultado = this.compareTo(competidor) > 0;
+		new Ordenamiento().setearOrdenCaracteristicasPorDefecto(); //qué pasa si no es static?
+		return resultado;
+	}
+
+	@Override
+	public int compareTo(Competidor c) {
+		int resultado = 0;
+		
+		for (Caracteristica caracteristicaDeComparacion : Ordenamiento.ordenCaracteristicas) {
+			resultado =
+				this.getPromedioCaracteristica(caracteristicaDeComparacion) -
+				c.getPromedioCaracteristica(caracteristicaDeComparacion);
+			if (resultado != 0) {
+				break;
+			}
+		}
+		return resultado;
 	}
 }

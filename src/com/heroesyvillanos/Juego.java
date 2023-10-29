@@ -1,13 +1,30 @@
 package com.heroesyvillanos;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Juego {
 	private List<Personaje> personajes;
 	private List<Liga> ligas;
-	private Ordenamiento ordenamiento;
     private Scanner scanner = new Scanner(System.in);
+    private static EnumMap<Caracteristica, String> caracteristicasMenu;
+    
+    private static void inicializarCaracteristicasMenu() {
+    	caracteristicasMenu = new EnumMap<Caracteristica, String>(Caracteristica.class);
+    	caracteristicasMenu.put(Caracteristica.VELOCIDAD, "1. Velocidad");
+    	caracteristicasMenu.put(Caracteristica.FUERZA, "2. Fuerza");
+    	caracteristicasMenu.put(Caracteristica.RESISTENCIA, "3. Resistencia");
+    	caracteristicasMenu.put(Caracteristica.DESTREZA, "4. Destreza");
+    }
+    
+    //inicialización
+    static {
+    	inicializarCaracteristicasMenu();
+    }
     
     public void mostrarMenu() {
         boolean continuar = true;
@@ -226,12 +243,12 @@ public class Juego {
 
             switch (seleccion) {
                 case 1:
-                    obtenerVencedoresContra();
+                    menuObtenerVencedoresContra();
                     break;
                 case 2:
-                    // TO DO: seleccionar las características por las que quieres ordenar
                     List<Caracteristica> criterios = seleccionarCriteriosOrdenamiento();
-                    listadoOrdenadoPorCaracteristica(criterios);
+                    boolean ascendente = seleccionarAscendente();
+                    listadoOrdenadoPorCaracteristica(criterios, ascendente);
                     break;
                 case 3:
                     seguir = false;
@@ -241,21 +258,154 @@ public class Juego {
             }
         }
     }
+
+	private void menuObtenerVencedoresContra() {
+    	/*
+		Toma un competidor y una caracteristica,
+		obtiene lista de competidores que vencerian a un
+		competidor basandose en una caracteristica
+		*/
+    	Personaje personajeAEvaluar = menuSeleccionarPersonaje();
+    	if (personajeAEvaluar == null)
+    	{
+    		menuReportes();
+    		return;
+    	}
+    	
+    	Caracteristica caracteristicaEvaluativa = menuSeleccionarCaracteristica();
+    	if (caracteristicaEvaluativa == null)
+    	{
+    		menuReportes();
+    		return;
+    	}
+		
+		System.out.println("Vencedores:");
+		System.out.println(obtenerVencedoresContra(personajeAEvaluar, caracteristicaEvaluativa));
+    }
     
-	public void obtenerVencedoresContra() {
-        System.out.println("");
-		// Toma un competidor y una caracteristica, obtiene lista de competidores que vencerian a un competidor basandose en una caracteristica
-		System.out.println("Obtiene listado de personajes o ligas que vencen a un personaje dado");
+    private Personaje menuSeleccionarPersonaje() {
+    	Personaje personajeAEvaluar = null;
+    	String entradaUsuario;
+    	
+    	System.out.println("Seleccione un personaje de la siguiente lista o ingrese 0 para salir:");
+		listarPersonajes();
+		while (personajeAEvaluar == null) {
+			entradaUsuario = scanner.nextLine();
+			if (entradaUsuario == "0") return null;
+			
+			personajeAEvaluar = obtenerPersonajePorNombreFantasia(entradaUsuario);			
+			if (personajeAEvaluar == null) {
+				System.out.println("El personaje ingresado no existe.");
+			}
+		}
+		return personajeAEvaluar;
+    }
+    
+    private Caracteristica menuSeleccionarCaracteristica() {
+    	Caracteristica caracteristicaEvaluativa = null;
+    	int entradaUsuario;
+    	
+    	System.out.println("Seleccione una caracteristica o ingrese 0 para salir:");
+		listarCaracteristicas();
+		while (caracteristicaEvaluativa == null) {
+			entradaUsuario = scanner.nextInt();
+			if (entradaUsuario == 0) return null;
+			
+			//Ver si se puede quitar el hardcode utilizando el mismo EnumMap (o hacer otro?)
+			switch (entradaUsuario) {
+				case 1: caracteristicaEvaluativa = Caracteristica.VELOCIDAD;
+				case 2: caracteristicaEvaluativa = Caracteristica.FUERZA;
+				case 3: caracteristicaEvaluativa = Caracteristica.RESISTENCIA;
+				case 4: caracteristicaEvaluativa = Caracteristica.DESTREZA;
+				default: System.out.println("La caracteristica seleccionada no existe.");
+			}
+		}
+		return caracteristicaEvaluativa;
+    }
+    
+    private Personaje obtenerPersonajePorNombreFantasia(String nombre) {
+    	for (Personaje personaje : personajes) {
+    		if (personaje.getNombreFantasia() == nombre) {
+    			return personaje;
+    		}
+    	}
+    	return null;
+    }
+    
+    private void listarCaracteristicas() {
+    	System.out.println(caracteristicasMenu.values());
+    }
+	
+	private List<Competidor> obtenerVencedoresContra(Competidor retador, Caracteristica caracteristica) {
+		List<Competidor> contrincantes = new ArrayList<Competidor>();
+		List<Competidor> vencedores = new ArrayList<Competidor>();
+		
+		contrincantes.addAll(ligas);
+		contrincantes.addAll(personajes);
+		
+		for (Competidor contrincante : contrincantes) {
+			if (contrincante.esGanador(retador, caracteristica)) {
+				vencedores.add(contrincante);
+			}
+		}
+		return vencedores;
 	}
 	
 	private List<Caracteristica> seleccionarCriteriosOrdenamiento() {
-        System.out.println("");
-		System.out.println("Obtiene listado ordenado de personajes por caracteristicas...");
-		return null;
+		List<Caracteristica> criterios = new LinkedList<Caracteristica>();
+		Caracteristica caracteristicaSeleccionada;
+		boolean salida = false;
+		boolean agregarCaracteristica = true;		
+		
+		while(!salida)
+		{
+			caracteristicaSeleccionada = menuSeleccionarCaracteristica();
+			
+			if (caracteristicaSeleccionada == null) {
+				return criterios;
+			}			
+			if (criterios.indexOf(caracteristicaSeleccionada) >= 0) {
+				System.out.println("La característica seleccionada ya fue seleccionada previamente. No pueden repetirse.");
+			}
+			else
+			{
+				criterios.add(caracteristicaSeleccionada);
+			}
+			
+			while(agregarCaracteristica) {
+				System.out.println("Ingrese 1 para agregar una nueva característica o 0 para salir:");
+				switch (scanner.nextInt()) {
+					case 0: {
+						agregarCaracteristica = false;
+						return criterios;
+					}
+					case 1: {}
+					default: System.out.println("Ingrese 1 para agregar una nueva característica o 0 para salir:");
+				}
+			}
+		}
+		return criterios;
 	}
 	
-	public void listadoOrdenadoPorCaracteristica(List<Caracteristica> criterios) {
-		// Devuelve lista de personajes ordenada por las caracteristicas especificadas.
+	private boolean seleccionarAscendente() {
+		while(true) {
+			System.out.println("Ingrese 1 para mostrar en orden ascendente, 0 para orden descendente:");
+			switch (scanner.nextInt()) {
+				case 0: return false;
+				case 1: return true;
+				default: System.out.println("El valor ingresado no es válido. Intente nuevamente.");
+			}
+		}
+	}
+	
+	public void listadoOrdenadoPorCaracteristica(List<Caracteristica> criterios, boolean ascendente) {
+		List<Competidor> personajesOrdenados = new ArrayList<Competidor>();
+		personajesOrdenados.addAll(personajes);
+		Collections.sort(personajesOrdenados, new Ordenamiento());
+		if (ascendente) { //probar si es así o al revés
+			Collections.reverse(personajesOrdenados);
+		}
+		System.out.println(personajesOrdenados);
 	}
 	
 	// ========== INICIO MENU REPORTES ==========

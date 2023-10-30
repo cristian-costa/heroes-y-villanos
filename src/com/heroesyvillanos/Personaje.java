@@ -8,6 +8,7 @@ public class Personaje implements Competidor, Comparable<Competidor> {
 	private String nombreFantasia;
 	private Map<Caracteristica, Integer> caracteristicas;
 	private boolean tipoCompetidor; //true para heroe, false para villano, esto se deberia cambiar por otra variable.
+	private static Ordenamiento orden = new Ordenamiento(); //convertir en singleton? Esta bien que cada competidor tenga un orden?
 
 	// Getters y Setters
 	public String getNombre() {
@@ -48,22 +49,22 @@ public class Personaje implements Competidor, Comparable<Competidor> {
 		return 0;
 	}
 
+	//Este método es igual en Liga y Personaje, debería ser distinto? Se puede reutilizar el código?
 	@Override
 	public boolean esGanador(Competidor competidor, Caracteristica c) {
 		boolean resultado = false;
-		// Determina si el personaje es ganador contra otro competidor basandose en una caracteristica especifica. 
-		// Ojo que si da empate se usa la caracteristica que sigue.
-		new Ordenamiento().compararPor(c);
+		orden.compararPor(c);
 		resultado = this.compareTo(competidor) > 0;
-		new Ordenamiento().setearOrdenCaracteristicasPorDefecto(); //qué pasa si no es static?
+		orden.setearOrdenCaracteristicasPorDefecto(); //es necesario?
 		return resultado;
 	}
 
+	//Este método es igual en Liga y Personaje, debería ser distinto? Se puede reutilizar el código?
 	@Override
 	public int compareTo(Competidor c) {
 		int resultado = 0;
 		
-		for (Caracteristica caracteristicaDeComparacion : Ordenamiento.ordenCaracteristicas) {
+		for (Caracteristica caracteristicaDeComparacion : orden.ordenCaracteristicas) {
 			resultado =
 				this.getPromedioCaracteristica(caracteristicaDeComparacion) -
 				c.getPromedioCaracteristica(caracteristicaDeComparacion);

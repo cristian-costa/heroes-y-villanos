@@ -6,17 +6,7 @@ public class Liga implements Competidor, Comparable<Competidor> {
 	private String nombreLiga;
 	private List<Competidor> competidores; // puede contener personajes y ligas
 	private boolean tipoCompetidor; // true para heroes, false para villanos, cambiar por algo mejor
-	
-	@Override
-	public boolean esGanador(Competidor competidor, Caracteristica c) {
-		boolean resultado = false;
-		// Determina si el personaje es ganador contra otro competidor basandose en una caracteristica especifica. 
-		// Ojo que si da empate se usa la caracteristica que sigue.
-		new Ordenamiento().compararPor(c);
-		resultado = this.compareTo(competidor) > 0;
-		new Ordenamiento().setearOrdenCaracteristicasPorDefecto(); //qué pasa si no es static?
-		return resultado;
-	}
+	private static Ordenamiento orden = new Ordenamiento(); //convertir en singleton? Esta bien que cada competidor tenga un orden?
 	
 	public void agregarCompetidorALiga() {
 		// Agrega personaje o liga a otra liga
@@ -44,12 +34,21 @@ public class Liga implements Competidor, Comparable<Competidor> {
 	public void setCompetidores(List<Competidor> competidores) {
 		this.competidores = competidores;
 	}
+	
+	@Override
+	public boolean esGanador(Competidor competidor, Caracteristica c) {
+		boolean resultado = false;
+		orden.compararPor(c);
+		resultado = this.compareTo(competidor) > 0;
+		orden.setearOrdenCaracteristicasPorDefecto(); //es necesario?
+		return resultado;
+	}
 
 	@Override
 	public int compareTo(Competidor c) {
 		int resultado = 0;
 		
-		for (Caracteristica caracteristicaDeComparacion : Ordenamiento.ordenCaracteristicas) {
+		for (Caracteristica caracteristicaDeComparacion : orden.ordenCaracteristicas) {
 			resultado =
 				this.getPromedioCaracteristica(caracteristicaDeComparacion) -
 				c.getPromedioCaracteristica(caracteristicaDeComparacion);

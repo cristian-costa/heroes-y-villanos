@@ -259,24 +259,29 @@ public class Juego {
         }
     }
 
+    /**
+	* Toma un competidor y una caracteristica,
+	* obtiene lista de competidores que vencerian a un
+	* competidor basandose en una caracteristica
+	*/
 	private void menuObtenerVencedoresContra() {
-    	/*
-		Toma un competidor y una caracteristica,
-		obtiene lista de competidores que vencerian a un
-		competidor basandose en una caracteristica
-		*/
-    	Personaje personajeAEvaluar = menuSeleccionarPersonaje();
-    	if (personajeAEvaluar == null)
-    	{
+		Caracteristica caracteristicaEvaluativa;
+		List<Caracteristica> caracteristicas;
+		Personaje personajeAEvaluar;
+		
+    	personajeAEvaluar = menuSeleccionarPersonaje();
+    	if (personajeAEvaluar == null) {
     		menuReportes();
     		return;
     	}
     	
-    	Caracteristica caracteristicaEvaluativa = menuSeleccionarCaracteristica();
-    	if (caracteristicaEvaluativa == null)
-    	{
+    	caracteristicas = menuSeleccionarCaracteristica(null);
+    	if (caracteristicas.isEmpty()) {
     		menuReportes();
     		return;
+    	}
+    	else {
+    		caracteristicaEvaluativa = caracteristicas.get(0);
     	}
 		
 		System.out.println("Vencedores:");
@@ -291,7 +296,7 @@ public class Juego {
 		listarPersonajes();
 		while (personajeAEvaluar == null) {
 			entradaUsuario = scanner.nextLine();
-			if (entradaUsuario == "0") return null;
+			if (entradaUsuario.equals("0")) return null;
 			
 			personajeAEvaluar = obtenerPersonajePorNombreFantasia(entradaUsuario);			
 			if (personajeAEvaluar == null) {
@@ -301,29 +306,8 @@ public class Juego {
 		return personajeAEvaluar;
     }
     
-    private Caracteristica menuSeleccionarCaracteristica() {
-    	Caracteristica caracteristicaEvaluativa = null;
-    	int entradaUsuario;
-    	
-    	System.out.println("Seleccione una caracteristica o ingrese 0 para salir:");
-		listarCaracteristicas();
-		while (caracteristicaEvaluativa == null) {
-			entradaUsuario = scanner.nextInt();
-			if (entradaUsuario == 0) return null;
-			
-			//Ver si se puede quitar el hardcode utilizando el mismo EnumMap (o hacer otro?)
-			switch (entradaUsuario) {
-				case 1: caracteristicaEvaluativa = Caracteristica.VELOCIDAD;
-				case 2: caracteristicaEvaluativa = Caracteristica.FUERZA;
-				case 3: caracteristicaEvaluativa = Caracteristica.RESISTENCIA;
-				case 4: caracteristicaEvaluativa = Caracteristica.DESTREZA;
-				default: System.out.println("La caracteristica seleccionada no existe.");
-			}
-		}
-		return caracteristicaEvaluativa;
-    }
-    
     private Personaje obtenerPersonajePorNombreFantasia(String nombre) {
+    	if (personajes == null) return null;
     	for (Personaje personaje : personajes) {
     		if (personaje.getNombreFantasia() == nombre) {
     			return personaje;
@@ -333,7 +317,7 @@ public class Juego {
     }
     
     private void listarCaracteristicas() {
-    	System.out.println(caracteristicasMenu.values());
+    	System.out.println(caracteristicasMenu.values()); //Funciona?
     }
 	
 	private List<Competidor> obtenerVencedoresContra(Competidor retador, Caracteristica caracteristica) {
@@ -352,38 +336,77 @@ public class Juego {
 	}
 	
 	private List<Caracteristica> seleccionarCriteriosOrdenamiento() {
+		//Se puede utilizar la clase ordenamiento? Vale la pena hacer una clase especifica para la lista de criterios?
 		List<Caracteristica> criterios = new LinkedList<Caracteristica>();
-		Caracteristica caracteristicaSeleccionada;
-		boolean salida = false;
-		boolean agregarCaracteristica = true;		
 		
-		while(!salida)
-		{
-			caracteristicaSeleccionada = menuSeleccionarCaracteristica();
+		criterios = menuSeleccionarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		if (criterios.isEmpty()) {
+			return criterios;
+		}
+		criterios = menuAgregarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		return criterios;
+	}
+	
+	private List<Caracteristica> menuSeleccionarCaracteristica(List<Caracteristica> criterios) {
+    	Caracteristica caracteristicaEvaluativa = null;
+    	int entradaUsuario;
+    	
+    	if (criterios == null) {
+    		criterios = new LinkedList<Caracteristica>();
+    	}
+    	
+    	System.out.println("Seleccione una caracteristica o ingrese 0 para salir:");
+		listarCaracteristicas();
+		while (caracteristicaEvaluativa == null) {
+			entradaUsuario = scanner.nextInt();
+			if (entradaUsuario == 0) return criterios;
 			
-			if (caracteristicaSeleccionada == null) {
-				return criterios;
-			}			
-			if (criterios.indexOf(caracteristicaSeleccionada) >= 0) {
+			//Ver si se puede quitar el hardcode utilizando el mismo EnumMap (o hacer otro?)
+			switch (entradaUsuario) {
+				case 1:
+					caracteristicaEvaluativa = Caracteristica.VELOCIDAD;
+					break;
+				case 2:
+					caracteristicaEvaluativa = Caracteristica.FUERZA;
+					break;
+				case 3:
+					caracteristicaEvaluativa = Caracteristica.RESISTENCIA;
+					break;
+				case 4:
+					caracteristicaEvaluativa = Caracteristica.DESTREZA;
+					break;
+				default: System.out.println("La caracteristica seleccionada no existe.");
+			}
+			if (criterios.indexOf(caracteristicaEvaluativa) >= 0) {
 				System.out.println("La característica seleccionada ya fue seleccionada previamente. No pueden repetirse.");
+				caracteristicaEvaluativa = null;
 			}
-			else
-			{
-				criterios.add(caracteristicaSeleccionada);
-			}
-			
-			while(agregarCaracteristica) {
-				System.out.println("Ingrese 1 para agregar una nueva característica o 0 para salir:");
-				switch (scanner.nextInt()) {
-					case 0: {
-						agregarCaracteristica = false;
-						return criterios;
-					}
-					case 1: {}
-					default: System.out.println("Ingrese 1 para agregar una nueva característica o 0 para salir:");
-				}
+			else {
+				criterios.add(caracteristicaEvaluativa);
 			}
 		}
+		return criterios;
+    }
+	
+	private List<Caracteristica> menuAgregarCaracteristica (List<Caracteristica> criterios) {
+		final String mensaje = "Ingrese 1 para agregar una nueva característica o 0 para salir:";
+		boolean agregarCaracteristica = true;
+		int entradaUsuario;
+		
+		while(agregarCaracteristica) {
+			System.out.println(mensaje);
+			entradaUsuario = scanner.nextInt();
+			switch (entradaUsuario) {
+				case 0: {
+					agregarCaracteristica = false;
+					return criterios;
+				}
+				case 1: criterios = menuSeleccionarCaracteristica(criterios);
+					break;
+				default: System.out.println(mensaje);
+			}
+		}
+		
 		return criterios;
 	}
 	
@@ -399,9 +422,20 @@ public class Juego {
 	}
 	
 	public void listadoOrdenadoPorCaracteristica(List<Caracteristica> criterios, boolean ascendente) {
+		if (criterios == null || criterios.isEmpty()) {
+			System.out.println("No se estableció un orden específico de características. Se utilizará el orden por defecto.");
+			criterios = new LinkedList<Caracteristica>();
+			criterios.addAll(new Ordenamiento().ordenCaracteristicas);
+		}
 		List<Competidor> personajesOrdenados = new ArrayList<Competidor>();
+		Ordenamiento orden = new Ordenamiento();
+		orden.setearOrdenCaracteristicas(criterios);
+		
+		if (personajes == null || personajes.isEmpty()) {
+			return;
+		}
 		personajesOrdenados.addAll(personajes);
-		Collections.sort(personajesOrdenados, new Ordenamiento());
+		Collections.sort(personajesOrdenados, orden);
 		if (ascendente) { //probar si es así o al revés
 			Collections.reverse(personajesOrdenados);
 		}

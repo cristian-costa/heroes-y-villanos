@@ -14,13 +14,16 @@ public class Ordenamiento implements Comparator<Competidor> {
 			Caracteristica.DESTREZA
 		)
 	);
-	public static List<Caracteristica> ordenCaracteristicas = new LinkedList<Caracteristica>();
+	public List<Caracteristica> ordenCaracteristicas = new LinkedList<Caracteristica>();
 	
 	public Ordenamiento() {
 		setearOrdenCaracteristicasPorDefecto();
 	}
 
-	@Override
+	/**
+	 * Comparator: se define el criterio de comparación para el sort
+	 * */
+	@Override	
 	public int compare(Competidor c1, Competidor c2) {
 		int resultado = 0;
 		for (Caracteristica caracteristicaDeComparacion : ordenCaracteristicas) {
@@ -34,21 +37,29 @@ public class Ordenamiento implements Comparator<Competidor> {
 		return resultado;
 	}
 	
+	/** Se define el orden de criterios para la comparacion, 
+	 * partiendo desde la caracteristica principal y 
+	 * recorriendo las otras según el orden por defecto
+	 * */
 	public void compararPor(Caracteristica caracteristicaPrincipal) {
 		int indiceCaracteristicaPrincipal;
 		
 		ordenCaracteristicas.clear();
+		
 		indiceCaracteristicaPrincipal = ordenCaracteristicasPorDefecto.indexOf(caracteristicaPrincipal);
-		/*
-		 * En base al orden por defecto, se agrega desde la característica indicada
-		 * hasta el final y desde el inicio hasta la característica indicada
-		 */
 		ordenCaracteristicas.addAll(indiceCaracteristicaPrincipal, ordenCaracteristicasPorDefecto);
 		ordenCaracteristicas.addAll(ordenCaracteristicasPorDefecto.subList(0, indiceCaracteristicaPrincipal));
 	}
 	
-	public void setearOrdenCaracteristicasPorDefecto() {
+	public Ordenamiento setearOrdenCaracteristicasPorDefecto() {
 		ordenCaracteristicas.clear();
 		ordenCaracteristicas.addAll(ordenCaracteristicasPorDefecto);
+		return this;
+	}
+	
+	public Ordenamiento setearOrdenCaracteristicas(List<Caracteristica> caracteristicas) {
+		ordenCaracteristicas.clear();
+		ordenCaracteristicas.addAll(caracteristicas);
+		return this;
 	}
 }

@@ -62,4 +62,18 @@ public class Personaje implements Competidor {
 		// Ojo que si da empate se usa la caracteristica que sigue.		
 		return false;
 	}
+	
+	public String toFileLine() {
+		
+		String str = "";
+		
+		if(this.tipoCompetidor) {
+			str = "Heroe";
+		}else {
+			str = "Villano";
+		}
+		//Velocidad, Fuerza, Resistencia, Destreza
+		return str + ", " + this.nombre +", "+ this.nombreFantasia+", "+this.caracteristicas.get(Caracteristica.VELOCIDAD)+", "+this.caracteristicas.get(Caracteristica.FUERZA)+", "+this.caracteristicas.get(Caracteristica.RESISTENCIA)+", "+this.caracteristicas.get(Caracteristica.DESTREZA);
+		
+	}
 }

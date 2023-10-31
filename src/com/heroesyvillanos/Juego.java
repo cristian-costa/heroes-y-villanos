@@ -1,8 +1,10 @@
 package com.heroesyvillanos;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,7 +90,12 @@ public class Juego {
                     listarPersonajes();
                     break;
                 case 4:
-                    guardarPersonajesEnArchivo();
+					try {
+						guardarPersonajesEnArchivo(this.personajes, "src/personajes.in");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                     break;
                 case 5:
                     seguir = false;
@@ -158,9 +165,19 @@ public class Juego {
 		System.out.println("Listando personajes...");
 	}
 	
-	public void guardarPersonajesEnArchivo() {
-        System.out.println("");
-		System.out.println("Guardando personajes en archivo...");
+	public void guardarPersonajesEnArchivo(ArrayList<Personaje> lista, String path) throws IOException {
+		
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+			
+			writer.write("Héroe/Villano, NombreReal, NombrePersonaje, Velocidad, Fuerza, Resistencia, Destreza");
+			writer.newLine();
+			for (Personaje personaje : lista) {
+				writer.write(personaje.toFileLine());
+				writer.newLine();
+			}
+        }catch (IOException e) {
+        	throw new IOException("Error al leer o escribir el archivo");
+        }
 	}
 	
 	// ========== FIN MENU PERSONAJES ==========
@@ -185,7 +202,7 @@ public class Juego {
             switch (seleccion) {
                 case 1:
                 	try {
-                		this.ligas = cargarLigasDesdeArchivo(this.personajes, "src/personajes.in");
+                		this.ligas = cargarLigasDesdeArchivo(this.personajes, "src/ligas.in");
             		}catch (FileNotFoundException e) {
             			// manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
             		}catch (IOException e) {
@@ -200,7 +217,12 @@ public class Juego {
                     listarLigas();
                     break;
                 case 4:
-                    guardarLigasEnArchivo();
+					try {
+						guardarLigasEnArchivo(this.ligas,"src/ligas.in");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                     break;
                 case 5:
                     seguir = false;
@@ -237,7 +259,7 @@ public class Juego {
 					}
             		//agrego las ligas
             		for(Liga lig : listaLiga) {
-            			if(lig.getNombreLiga().trim().equals(personajeNombre.trim() )) {
+            			if(lig.getNombre().trim().equals(personajeNombre.trim() )) {
             				heovi=lig.isTipoCompetidor();
 							competidores.add(lig);
 						}
@@ -271,9 +293,16 @@ public class Juego {
 		System.out.println("Listando ligas...");
 	}
 	
-	public void guardarLigasEnArchivo() {
-        System.out.println("");
-		System.out.println("Guardando ligas en archivo...");
+	public void guardarLigasEnArchivo(ArrayList<Liga> lista, String path) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+			for (Liga liga : lista) {
+				writer.write(liga.toFileLine());
+				writer.newLine();
+			}			
+			
+        }catch (IOException e) {
+        	throw new IOException("Error al leer o escribir el archivo");
+        }
 	}
 	
 	// ========== FIN MENU LIGAS ==========

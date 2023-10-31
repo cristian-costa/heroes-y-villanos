@@ -25,7 +25,7 @@ public class Liga implements Competidor {
 	}
 	
 	// Getters y Setters
-	public String getNombreLiga() {
+	public String getNombre() {
 		return nombreLiga;
 	}
 	
@@ -52,15 +52,14 @@ public class Liga implements Competidor {
 		this.tipoCompetidor = tipoCompetidor;
 	}
 
-	@Override
-	public String toString() {
-	
+	public String toFileLine() {
+		
 		StringBuilder sb = new StringBuilder();
-		sb.append("Nombre Liga = "+this.nombreLiga+";");
+		sb.append(this.nombreLiga);
 		for ( Competidor c : competidores) {
-			Personaje pj = (Personaje) c;
-			sb.append(pj.getNombreFantasia() +";");
+			sb.append(", " + c.getNombre());
 		}
 		return sb.toString();
 	}
+	
 }

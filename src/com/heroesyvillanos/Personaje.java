@@ -2,22 +2,32 @@ package com.heroesyvillanos;
 
 import java.util.Map;
 
-public class Personaje implements Competidor {
+public class Personaje extends Competidor {
 	private String nombre;
 	private String nombreFantasia;
 	private Map<Caracteristica, Integer> caracteristicas;
-	private boolean tipoCompetidor; //true para heroe, false para villano, esto se deberia cambiar por otra variable.
+	
+	Personaje(String nombre, String nombreFantasia, Map<Caracteristica, Integer> caracteristicas, TipoCompetidor tipo) throws IllegalArgumentException{
+		if(!esNombreValido(nombre)) {
+			throw new IllegalArgumentException("Nombre invalido");
+		}
 
-	public Personaje(String nombre, String nombreFantasia, Map<Caracteristica, Integer> caracteristicas,
-			boolean tipoCompetidor) {
-		super();
+		if(!esNombreValido(nombreFantasia)) {
+			throw new IllegalArgumentException("Nombre fantasia invalido");
+		}
+
+		if(caracteristicas.size() < Caracteristica.values().length) {
+			throw new IllegalArgumentException("Faltan valores para alguna/s caracteristica");
+		}
+
+		this.tipoCompetidor = tipo;
 		this.nombre = nombre;
 		this.nombreFantasia = nombreFantasia;
 		this.caracteristicas = caracteristicas;
-		this.tipoCompetidor = tipoCompetidor;
+		estaDentroDeLiga = false;
 	}
 	
-	// Getters y Setters
+	// Getters y Setters -> nombre
 	public String getNombre() {
 		return nombre;
 	}
@@ -25,13 +35,34 @@ public class Personaje implements Competidor {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-
+	
+	// Getters y Setters -> nombreFantasia
 	public String getNombreFantasia() {
 		return nombreFantasia;
 	}
 
 	public void setNombreFantasia(String nombreFantasia) {
 		this.nombreFantasia = nombreFantasia;
+	}
+	
+	@Override
+	public int getPromedioCaracteristica(Caracteristica c) {
+		return caracteristicas.get(c);
+	}
+	
+	@Override
+	protected int getSumaCaracteristica(Caracteristica c) {
+		return caracteristicas.get(c);
+	}
+	
+	@Override
+	protected int getCantidadCompetidores() {
+		return 1;
+	}
+	
+	@Override
+	public String toString() {
+		return nombre + ", " + nombreFantasia;
 	}
 
 	public Map<Caracteristica, Integer> getCaracteristicas() {
@@ -42,38 +73,23 @@ public class Personaje implements Competidor {
 		this.caracteristicas = caracteristicas;
 	}
 
-	public boolean isTipoCompetidor() {
+	public TipoCompetidor isTipoCompetidor() {
 		return tipoCompetidor;
 	}
 
-	public void setTipoCompetidor(boolean tipoCompetidor) {
+	public void setTipoCompetidor(TipoCompetidor tipoCompetidor) {
 		this.tipoCompetidor = tipoCompetidor;
-	}
-
-	@Override
-	public int getPromedioCaracteristica(Caracteristica c) {
-		// Obtiene valor promedio
-		return 0;
-	}
-
-	@Override
-	public boolean esGanador(Competidor competidor, Caracteristica c) {
-		// Determina si el personaje es ganador contra otro competidor basandose en una caracteristica especifica. 
-		// Ojo que si da empate se usa la caracteristica que sigue.		
-		return false;
 	}
 	
 	public String toFileLine() {
-		
 		String str = "";
 		
-		if(this.tipoCompetidor) {
+		if(this.tipoCompetidor == TipoCompetidor.HEROE) {
 			str = "Heroe";
 		}else {
 			str = "Villano";
 		}
 		//Velocidad, Fuerza, Resistencia, Destreza
 		return str + ", " + this.nombre +", "+ this.nombreFantasia+", "+this.caracteristicas.get(Caracteristica.VELOCIDAD)+", "+this.caracteristicas.get(Caracteristica.FUERZA)+", "+this.caracteristicas.get(Caracteristica.RESISTENCIA)+", "+this.caracteristicas.get(Caracteristica.DESTREZA);
-		
 	}
 }

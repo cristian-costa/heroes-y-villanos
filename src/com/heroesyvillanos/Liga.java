@@ -1,21 +1,50 @@
 package com.heroesyvillanos;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Liga extends Competidor {
+public class Liga extends Competidor implements Comparable<Competidor> {
 	private String nombreLiga;
-	private List<Competidor> competidores;	
+	private List<Competidor> competidores; // puede contener personajes y ligas
 	private Map<Caracteristica, Integer> cache_promedio_caracteristicas;
 	
-	Liga(String nombre, List<Competidor> competidores) throws Exception{
+	// Constructor
+	Liga(String nombre, TipoCompetidor tipo) throws Exception{
 		if(!esNombreValido(nombre)) {
 			throw new Exception("Nombre invalido");
 		}
 		
-		nombreLiga = nombre;
+		this.tipoCompetidor = tipo;
+
+		this.nombreLiga = nombre;
+		this.competidores = new ArrayList<Competidor>();
+		this.cache_promedio_caracteristicas = new HashMap<Caracteristica, Integer>();
+	}
+	
+	// Constructor
+	Liga(String nombre, List<Competidor> competidores, TipoCompetidor tipo) throws Exception{
+		if(!esNombreValido(nombre)) {
+			throw new Exception("Nombre invalido");
+		}
+		
+		for (Competidor c : competidores) {
+			if(c.tipoCompetidor != tipo) {
+				throw new Exception("No se puede agregar un personaje/liga a una liga con distintos tipos de competidor");
+			}
+		}
+		
+		
+		this.tipoCompetidor = tipo;
+		this.nombreLiga = nombre;
 		this.competidores = competidores;
+		this.cache_promedio_caracteristicas = new HashMap<Caracteristica, Integer>();
 		this.updateCacheCaracteristicas();
+	}
+	
+	public String getNombreLiga() {
+		return this.nombreLiga;
 	}
 	
 	protected void agregarCompetidorALiga(Competidor c) throws Exception {
@@ -61,7 +90,7 @@ public class Liga extends Competidor {
 		}
 		return sum;
 	}
-		
+	
 	public List<Competidor> getCompetidores() {
 		return competidores;
 	}
@@ -71,4 +100,26 @@ public class Liga extends Competidor {
 		return nombreLiga;
 	}
 	
+	// Getters y Setters
+	public String getNombre() {
+		return nombreLiga;
+	}
+	
+	public void setCompetidores(List<Competidor> competidores) {
+		this.competidores = competidores;
+	}
+	
+	public TipoCompetidor isTipoCompetidor() {
+		return tipoCompetidor;
+	}
+
+	// VER -> metodo getNombre
+	public String toFileLine() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.nombreLiga);
+//		for (Competidor c : competidores) {
+//			sb.append(", " + c.getNombre());
+//		}
+		return sb.toString();
+	}
 }

@@ -9,6 +9,7 @@ class PersonajeTest {
 	void testConstructorNormal() {
 		String nombre = "peter";
 		String nombreFantasia = "peter";
+		TipoCompetidor tipo = TipoCompetidor.HEROE;
 		Map<Caracteristica, Integer> caracteristicas = Map.ofEntries(
 			Map.entry(Caracteristica.VELOCIDAD, 10),
 			Map.entry(Caracteristica.FUERZA, 10),
@@ -16,7 +17,7 @@ class PersonajeTest {
 			Map.entry(Caracteristica.DESTREZA, 10)
 		);
 		try {
-			new Personaje(nombre, nombreFantasia, caracteristicas);
+			new Personaje(nombre, nombreFantasia, caracteristicas, tipo);
 		} catch (Exception e) {
 			fail();
 		}
@@ -26,6 +27,7 @@ class PersonajeTest {
 	void testConstructorError() {
 		String nombre = "peter";
 		String nombreFantasia = "spider-man";
+		TipoCompetidor tipo = TipoCompetidor.HEROE;
 		Map<Caracteristica, Integer> caracteristicas = Map.ofEntries(
 				Map.entry(Caracteristica.VELOCIDAD, 10),
 				Map.entry(Caracteristica.FUERZA, 10),
@@ -39,11 +41,11 @@ class PersonajeTest {
 		
 		try {
 			//Caso faltan caracteristicas
-			new Personaje(nombre, nombreFantasia, caracteristicasError);
+			new Personaje(nombre, nombreFantasia, caracteristicasError, tipo);
 			
 			//Caso nombres invalidos
-			new Personaje(nombre, "", caracteristicas);
-			new Personaje("", nombreFantasia, caracteristicas);
+			new Personaje(nombre, "", caracteristicas, tipo);
+			new Personaje("", nombreFantasia, caracteristicas, tipo);
 			
 		} catch (IllegalArgumentException e) {
 			return;
@@ -56,6 +58,7 @@ class PersonajeTest {
 	void testMethods() {
 		String nombre = "peter";
 		String nombreFantasia = "spider-man";
+		TipoCompetidor tipo = TipoCompetidor.HEROE;
 		Map<Caracteristica, Integer> caracteristicas = Map.ofEntries(
 				Map.entry(Caracteristica.VELOCIDAD, 10),
 				Map.entry(Caracteristica.FUERZA, 10),
@@ -63,7 +66,7 @@ class PersonajeTest {
 				Map.entry(Caracteristica.DESTREZA, 10)
 		);
 		
-		Personaje p = new Personaje(nombre, nombreFantasia, caracteristicas);
+		Personaje p = new Personaje(nombre, nombreFantasia, caracteristicas, tipo);
 		
 		//Test de get promedio valores caracteristicas
 		for(Caracteristica c : Caracteristica.values()) {
@@ -82,7 +85,7 @@ class PersonajeTest {
 		}
 		
 		//Test de cantidad competidores, caso personaje==1
-		assertEquals(1, p.getCantidadCompetidores());
+		assertEquals(1, p.getCantidadCompetidores());		
 	}
 	
 }

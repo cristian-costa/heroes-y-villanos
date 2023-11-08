@@ -35,11 +35,11 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 			}
 		}
 		
-		
 		this.tipoCompetidor = tipo;
 		this.nombreLiga = nombre;
 		this.competidores = competidores;
 		this.cache_promedio_caracteristicas = new HashMap<Caracteristica, Integer>();
+		
 		this.updateCacheCaracteristicas();
 	}
 	

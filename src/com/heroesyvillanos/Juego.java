@@ -11,11 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.LinkedList;
+import java.util.Collections;
 
 public class Juego {
 	private List<Personaje> personajes = new ArrayList<Personaje>();
 	private List<Liga> ligas = new ArrayList<Liga>();
-	private Ordenamiento ordenamiento;
     private Scanner scanner = new Scanner(System.in);
     
     public void mostrarMenu() throws Exception {
@@ -286,7 +287,7 @@ public class Juego {
 			}
 		} else {
 			throw new Exception("La lista de personajes está vacía."); 
-		}
+		}		
 	}
 	
 	// ========== FIN MENU PERSONAJES ==========
@@ -303,9 +304,8 @@ public class Juego {
             System.out.println("2. Creación");
             System.out.println("3. Listado");
             System.out.println("4. Guardar en archivo todas las ligas");
-            System.out.println("5. Agregar Personajes a Liga");
-            System.out.println("6. Agregar Liga a Liga");
-            System.out.println("7. Regresar al Menú Principal");
+            System.out.println("5. Agregar Competidores a Liga");
+            System.out.println("6. Regresar al Menú Principal");
             System.out.print("Seleccione una opción: ");
 
             int seleccion = scanner.nextInt();
@@ -315,12 +315,11 @@ public class Juego {
                 	try {
                 		this.ligas = cargarLigasDesdeArchivo(this.personajes, "src/ligas.in");
             		}catch (FileNotFoundException e) {
-            			// manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
+            			// Manejo del error. yo devuelvo una excepcion, este por si no esta el archivo 
             		}catch (IOException e) {
             			// Este por si falla la lectura del archvo  
             		}
-            
-                    break;
+                	break;
                 case 2:
                     crearLiga();
                     break;
@@ -340,14 +339,10 @@ public class Juego {
 					}
                     break;
                 case 5:
-                	scanner.nextLine();
-                	agregaCompetidorALiga(1);//agrega personaje
+                	scanner.nextLine();          
+                	ingresaNombreLigaAgregaCompetidor(); 
                     break;
                 case 6:
-                	scanner.nextLine();
-                	agregaCompetidorALiga(2);//agrega Liga
-                    break;
-                case 7:
                     seguir = false;
                     break;
                 default:
@@ -420,19 +415,19 @@ public class Juego {
 	
 	private boolean existeLigaEnMemoria(String s) {
 		for(int i=0;i<ligas.size();i++)	{
-			if(ligas.get(i).getNombreLiga().contains(s))
+			if(ligas.get(i).getNombreLiga().equalsIgnoreCase(s))
 				return true;
 		}
 		return false;
 	}
 	
-	public void crearLiga() {
+	public void crearLiga() throws Exception{
 		System.out.println("");
 		System.out.println("Creando liga...");
 		String nombreLiga;
 		boolean valido, seguir;
 		TipoCompetidor tipoLiga;
-		int indexLiga, opcion;
+		int indexLiga;
 		scanner.nextLine();
 
 		do {
@@ -465,10 +460,39 @@ public class Juego {
 		indexLiga = ligas.size() - 1;
 
 		// AGREGO PERSONAJE O LIGA
+		seleccionaCompetidorAAgregar(indexLiga);
+
+	}
+	
+	private void ingresaNombreLigaAgregaCompetidor() throws Exception{
+		// INGRESO NOMBRE de LIGA a agregar competidores
+		boolean seguir=true;
+		int indiceLigaAgregar;
+		
+		this.listarLigas();
+
+		System.out.println("Ingrese el numero de liga al que desea agregar competidores: ");
+		indiceLigaAgregar = scanner.nextInt();
 
 		do {
+			if (indiceLigaAgregar > 0 && indiceLigaAgregar <= ligas.size()) 
+				seguir=false;
+			else {
+				System.out.println("Opcion incorrecta, ingrese una valida: ");
+				indiceLigaAgregar = scanner.nextInt();
+				seguir=true;
+			}
+		}while(seguir);
+		
+			seleccionaCompetidorAAgregar(indiceLigaAgregar-1);
+	}
+	
+	private void seleccionaCompetidorAAgregar(int indexLiga)  throws Exception{
+		int opcion;
+		boolean seguir;
+		do {
 			seguir = false;
-			System.out.println("AGREGAR COMPETIDORES A LA LIGA...... '" + nombreLiga + "'....... ");
+			System.out.println("AGREGAR COMPETIDORES A LA LIGA...... '" + ligas.get(indexLiga).getNombre() + "'....... ");
 			System.out.println(" 1. Agregar un Personaje");
 			System.out.println(" 2. Agregar una Liga");
 			System.out.println(" 3. Volver al menu de Ligas: ");
@@ -488,6 +512,7 @@ public class Juego {
 			case 2:
 				if (ligas.size()>1 ) {  //la unica liga cargada es la actual
 					scanner.nextLine();
+					
 					agregaLigaALiga(indexLiga);
 				}
 				else
@@ -503,82 +528,69 @@ public class Juego {
 				}
 			}
 		} while (seguir);
+
+		
 	}
 	
-	private void agregaCompetidorALiga(int opcion) {
-		String nombreLiga;
-		int i;
-		
-		// INGRESO NOMBRE de LIGA
-		System.out.print("Ingrese nombre de la Liga para agregar Competidores: ");
-		nombreLiga = scanner.nextLine();
+	private void agregaPersonajeALiga(int indexLiga) throws Exception {
 
-		if (!validaCadena(nombreLiga) || !existeLigaEnMemoria(nombreLiga)) {
-			System.out.print("El nombre de Liga ingresado no es valido o no existe... ");
-		}
-		else {
-			for(i=0; i < this.ligas.size(); i++) {
-				if(ligas.get(i).getNombreLiga().equalsIgnoreCase(nombreLiga))
-					break;
+		boolean seguir=true;
+		int indicePersonaje;
+		
+		this.listarPersonajes();
+		System.out.println("Ingrese el numero de personaje que desea agregar: ");
+		indicePersonaje = scanner.nextInt();
+		
+		do {
+			if(indicePersonaje > 0 && indicePersonaje <= personajes.size() ) {
+					try {
+						ligas.get(indexLiga).agregarCompetidorALiga(personajes.get(indicePersonaje-1));
+						System.out.println("Personaje CARGADO CORRECTAMENTE A LA LIGA");
+					} catch (Exception E) {
+						System.out.println(E.getMessage());
+					}
+					seguir=false;
 			}
-			
-			if(opcion==1)
-				agregaPersonajeALiga(i);
-			else
-				agregaLigaALiga(i);
-		}
-	}
-	
-	private void agregaPersonajeALiga(int indexLiga) {
-		String nombreFantasia;
-		boolean seguir;
-		int aux = 0;
-		System.out.println("Ingrese nombre de Personaje: ");
-		nombreFantasia = scanner.nextLine();
-		seguir = true;
-		
-		while (seguir && aux < personajes.size()) {
-			if (personajes.get(aux).getNombreFantasia().equalsIgnoreCase(nombreFantasia)) {
-				try {
-					ligas.get(indexLiga).agregarCompetidorALiga(personajes.get(aux));
-					System.out.println("Personaje CARGADO CORRECTAMENTE A LA LIGA");
-				} catch (Exception E) {
-					System.out.println(E.getMessage());
-				}
-				seguir = false;
+			else {
+				System.out.println("Opcion incorrecta, ingrese una valida: ");
+				indicePersonaje = scanner.nextInt();
+				seguir=true;
 			}
-			else
-				aux++;
-		}
-		
-		if(seguir)
-			System.out.println("No se encuentra el personaje...");
+		}while(seguir);
 	}
 	
-	private void agregaLigaALiga(int indexLiga) {
-		String nombreLiga;
-		boolean seguir;
-		int aux = 0;
+	private void agregaLigaALiga(int indexLiga) throws Exception {
 
-		System.out.println("Ingrese nombre de Liga: ");
-		nombreLiga = scanner.nextLine();
-		seguir = true;
+		boolean seguir=true;
+		int indiceLigaAgregar;
+		this.listarLigas();
+		System.out.println("Ingrese el numero de liga que desea agregar: ");
+		indiceLigaAgregar = scanner.nextInt();
 
-		while (seguir & aux < ligas.size()) {
-			if (ligas.get(aux).getNombreLiga().equalsIgnoreCase(nombreLiga)) {
-				try {
-					ligas.get(indexLiga).agregarCompetidorALiga(ligas.get(aux));
-					System.out.println("Liga CARGADA CORRECTAMENTE");
-
-				} catch (Exception E) {
-					System.out.println(E.getMessage());
+		do {
+			if (indiceLigaAgregar > 0 && indiceLigaAgregar <= ligas.size()) {
+				seguir=false;
+				if (!ligas.get(indiceLigaAgregar-1).getCompetidores().contains(ligas.get(indexLiga))) { // evita que la liga
+																										// entre en una liga
+																										// que forma parte de
+																										// ella
+					try {
+						ligas.get(indexLiga).agregarCompetidorALiga(ligas.get(indiceLigaAgregar-1));
+						System.out.println("Liga CARGADA CORRECTAMENTE");
+					} catch (Exception E) {
+						System.out.println(E.getMessage());
+					}
+					
 				}
-				seguir = false;
-			} else
-				aux++;
-		}
-		if (seguir)
-			System.out.println("No se encuentra la Liga... ");
+				else
+					System.out.println("Liga no valida.");
+			}
+			else {
+				System.out.println("Opcion incorrecta, ingrese una valida: ");
+				indiceLigaAgregar = scanner.nextInt();
+				seguir=true;
+			}
+		}while(seguir);
 	}
 	
 	public void listarLigas() throws Exception{
@@ -598,7 +610,7 @@ public class Juego {
 	
 	// ========== INICIO MENU COMBATES ==========
 
-	private void menuCombates() {
+    private void menuCombates() {
         boolean seguir = true;
 
         while (seguir) {
@@ -626,24 +638,22 @@ public class Juego {
             }
         }
     }
-	
+
     public void realizarCombateMenu() {
     	try {
     		System.out.println("");
     		System.out.println("Elegir primer competidor:");
         	Competidor comp1 = seleccionarCompetidor();
-        	
         	System.out.println("");
     		System.out.println("Elegir segundo competidor:");
         	Competidor comp2 = seleccionarCompetidor();
-        	
         	Caracteristica car = seleccionarCaracteristica();
         	combatir(comp1, comp2, car);
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
 			System.out.println("Regresando al menú de combates");
-		}	
+		}
     }
     
     public Competidor seleccionarCompetidor() throws Exception {
@@ -724,7 +734,7 @@ public class Juego {
     	}
     }
     
-	public void combatir(Competidor c1, Competidor c2, Caracteristica car) {
+	public void combatir(Competidor c1, Competidor c2, Caracteristica car) throws Exception {
 		// Toma dos competidores y una caracteristica
 		System.out.println("");
 		System.out.println("Combatiendo...");
@@ -761,7 +771,7 @@ public class Juego {
 
 	// ========== INICIO MENU REPORTES ==========
 
-    private void menuReportes() {
+    private void menuReportes() throws Exception {
         boolean seguir = true;
 
         while (seguir) {
@@ -776,12 +786,12 @@ public class Juego {
 
             switch (seleccion) {
                 case 1:
-                    obtenerVencedoresContra();
+                	menuObtenerVencedoresContra();
                     break;
                 case 2:
-                    // TO DO: seleccionar las características por las que quieres ordenar
                     List<Caracteristica> criterios = seleccionarCriteriosOrdenamiento();
-                    listadoOrdenadoPorCaracteristica(criterios);
+                    boolean ascendente = seleccionarAscendente();
+                    listadoOrdenadoPorCaracteristica(criterios, ascendente);
                     break;
                 case 3:
                     seguir = false;
@@ -792,21 +802,188 @@ public class Juego {
         }
     }
     
-	public void obtenerVencedoresContra() {
-        System.out.println("");
-		// Toma un competidor y una caracteristica, obtiene lista de competidores que vencerian a un competidor basandose en una caracteristica
-		System.out.println("Obtiene listado de personajes o ligas que vencen a un personaje dado");
+    /**
+	* Toma un competidor y una caracteristica,
+	* obtiene lista de competidores que vencerian a un
+	* competidor basandose en una caracteristica
+     * @throws Exception 
+	*/
+	private void menuObtenerVencedoresContra() throws Exception {
+		Caracteristica caracteristicaEvaluativa;
+		List<Caracteristica> caracteristicas;
+		Personaje personajeAEvaluar;
+		
+    	personajeAEvaluar = menuSeleccionarPersonaje();
+    	if (personajeAEvaluar == null) {
+    		menuReportes();
+    		return;
+    	}
+    	
+    	caracteristicas = menuSeleccionarCaracteristica(null);
+    	if (caracteristicas.isEmpty()) {
+    		menuReportes();
+    		return;
+    	}
+    	else {
+    		caracteristicaEvaluativa = caracteristicas.get(0);
+    	}
+		
+		System.out.println("Vencedores:");
+		System.out.println(obtenerVencedoresContra(personajeAEvaluar, caracteristicaEvaluativa));
+    }
+	
+    private Personaje menuSeleccionarPersonaje() throws Exception {
+    	Personaje personajeAEvaluar = null;
+    	String entradaUsuario;
+    	
+    	System.out.println("Seleccione un personaje de la siguiente lista o ingrese 0 para salir:");
+		listarPersonajes();
+		while (personajeAEvaluar == null) {
+			entradaUsuario = scanner.nextLine();
+			if (entradaUsuario.equals("0")) return null;
+			
+			personajeAEvaluar = obtenerPersonajePorNombreFantasia(entradaUsuario);			
+			if (personajeAEvaluar == null) {
+				System.out.println("El personaje ingresado no existe.");
+			}
+		}
+		return personajeAEvaluar;
+    }
+    
+    private Personaje obtenerPersonajePorNombreFantasia(String nombre) {
+    	if (personajes == null) return null;
+    	for (Personaje personaje : personajes) {
+    		if (personaje.getNombreFantasia() == nombre) {
+    			return personaje;
+    		}
+    	}
+    	return null;
+    }
+    
+	private List<Competidor> obtenerVencedoresContra(Competidor retador, Caracteristica caracteristica) throws Exception {
+		List<Competidor> contrincantes = new ArrayList<Competidor>();
+		List<Competidor> vencedores = new ArrayList<Competidor>();
+		
+		contrincantes.addAll(ligas);
+		contrincantes.addAll(personajes);
+
+		// VER -> Ver esta logiva de contrincante.esGanador. antes retornaba un boolean, ahora un int. Creo que si es negativo es que no es ganador, pero no se como se implemento.
+		// Agrego la condicion de que sea > 0 para considerarlo ganador, por ahi hay que modificar esta logica, lo agrego para que compile.
+		for (Competidor contrincante : contrincantes) {
+			if (contrincante.esGanador(retador, caracteristica) > 0) {
+				vencedores.add(contrincante);
+			}
+		}
+		return vencedores;
 	}
 	
 	private List<Caracteristica> seleccionarCriteriosOrdenamiento() {
-        System.out.println("");
-		System.out.println("Obtiene listado ordenado de personajes por caracteristicas...");
-		return null;
+		//Se puede utilizar la clase ordenamiento? Vale la pena hacer una clase especifica para la lista de criterios?
+		List<Caracteristica> criterios = new LinkedList<Caracteristica>();
+		
+		criterios = menuSeleccionarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		if (criterios.isEmpty()) {
+			return criterios;
+		}
+		criterios = menuAgregarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		return criterios;
 	}
 	
-	public void listadoOrdenadoPorCaracteristica(List<Caracteristica> criterios) {
-		// Devuelve lista de personajes ordenada por las caracteristicas especificadas.
+	private List<Caracteristica> menuSeleccionarCaracteristica(List<Caracteristica> criterios) {
+    	Caracteristica caracteristicaEvaluativa = null;
+    	int entradaUsuario;
+    	
+    	if (criterios == null) {
+    		criterios = new LinkedList<Caracteristica>();
+    	}
+    	
+    	System.out.println("Seleccione una caracteristica o ingrese 0 para salir:");
+		listarCaracteristicas();
+		while (caracteristicaEvaluativa == null) {
+			entradaUsuario = scanner.nextInt();
+			if (entradaUsuario == 0) return criterios;
+			
+			//Ver si se puede quitar el hardcode utilizando el mismo EnumMap (o hacer otro?)
+			switch (entradaUsuario) {
+				case 1:
+					caracteristicaEvaluativa = Caracteristica.VELOCIDAD;
+					break;
+				case 2:
+					caracteristicaEvaluativa = Caracteristica.FUERZA;
+					break;
+				case 3:
+					caracteristicaEvaluativa = Caracteristica.RESISTENCIA;
+					break;
+				case 4:
+					caracteristicaEvaluativa = Caracteristica.DESTREZA;
+					break;
+				default: System.out.println("La caracteristica seleccionada no existe.");
+			}
+			if (criterios.indexOf(caracteristicaEvaluativa) >= 0) {
+				System.out.println("La característica seleccionada ya fue seleccionada previamente. No pueden repetirse.");
+				caracteristicaEvaluativa = null;
+			}
+			else {
+				criterios.add(caracteristicaEvaluativa);
+			}
+		}
+		return criterios;
+    }
+    
+	private List<Caracteristica> menuAgregarCaracteristica (List<Caracteristica> criterios) {
+		final String mensaje = "Ingrese 1 para agregar una nueva característica o 0 para salir:";
+		boolean agregarCaracteristica = true;
+		int entradaUsuario;
+		
+		while(agregarCaracteristica) {
+			System.out.println(mensaje);
+			entradaUsuario = scanner.nextInt();
+			switch (entradaUsuario) {
+				case 0: {
+					agregarCaracteristica = false;
+					return criterios;
+				}
+				case 1: criterios = menuSeleccionarCaracteristica(criterios);
+					break;
+				default: System.out.println(mensaje);
+			}
+		}
+		
+		return criterios;
+	}
+	
+	private boolean seleccionarAscendente() {
+		while(true) {
+			System.out.println("Ingrese 1 para mostrar en orden ascendente, 0 para orden descendente:");
+			switch (scanner.nextInt()) {
+				case 0: return false;
+				case 1: return true;
+				default: System.out.println("El valor ingresado no es válido. Intente nuevamente.");
+			}
+		}
+	}
+	
+	public void listadoOrdenadoPorCaracteristica(List<Caracteristica> criterios, boolean ascendente) {
+		if (criterios == null || criterios.isEmpty()) {
+			System.out.println("No se estableció un orden específico de características. Se utilizará el orden por defecto.");
+			criterios = new LinkedList<Caracteristica>();
+			criterios.addAll(new Ordenamiento().ordenCaracteristicas);
+		}
+		List<Competidor> personajesOrdenados = new ArrayList<Competidor>();
+		Ordenamiento orden = new Ordenamiento();
+		orden.setearOrdenCaracteristicas(criterios);
+		
+		if (personajes == null || personajes.isEmpty()) {
+			return;
+		}
+		personajesOrdenados.addAll(personajes);
+		Collections.sort(personajesOrdenados, orden);
+		if (ascendente) { //probar si es así o al revés
+			Collections.reverse(personajesOrdenados);
+		}
+		System.out.println(personajesOrdenados);
 	}
 	
 	// ========== FIN MENU REPORTES ==========
 }
+

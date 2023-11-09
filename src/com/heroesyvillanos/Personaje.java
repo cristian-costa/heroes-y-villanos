@@ -1,4 +1,5 @@
 package com.heroesyvillanos;
+
 import java.util.Map;
 
 public class Personaje extends Competidor {
@@ -33,10 +34,6 @@ public class Personaje extends Competidor {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
-		this.nombreFantasia = nombreFantasia;
-		this.caracteristicas = caracteristicas;
-		estaDentroDeLiga = false;
-		
 	}
 	
 	// Getters y Setters -> nombreFantasia

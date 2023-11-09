@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Liga extends Competidor {
+public class Liga extends Competidor implements Comparable<Competidor> {
 	private String nombreLiga;
 	private List<Competidor> competidores; // puede contener personajes y ligas
-	protected TipoCompetidor tipoCompetidor;
 	private Map<Caracteristica, Integer> cache_promedio_caracteristicas;
 	
 	// Constructor
@@ -22,6 +21,8 @@ public class Liga extends Competidor {
 		this.nombreLiga = nombre;
 		this.competidores = new ArrayList<Competidor>();
 		this.cache_promedio_caracteristicas = new HashMap<Caracteristica, Integer>();
+		for (Caracteristica c : Caracteristica.values())    //caracteristicas en 0 
+			cache_promedio_caracteristicas.put(c, 0);
 	}
 	
 	// Constructor
@@ -30,9 +31,16 @@ public class Liga extends Competidor {
 			throw new Exception("Nombre invalido");
 		}
 		
+		for (Competidor c : competidores) {
+			if(c.tipoCompetidor != tipo) {
+				throw new Exception("No se puede agregar un personaje/liga a una liga con distintos tipos de competidor");
+			}
+		}
+		
 		this.tipoCompetidor = tipo;
 		this.nombreLiga = nombre;
 		this.competidores = competidores;
+		this.cache_promedio_caracteristicas = new HashMap<Caracteristica, Integer>();
 		
 		this.updateCacheCaracteristicas();
 	}
@@ -45,7 +53,9 @@ public class Liga extends Competidor {
 		if(!tipoCompetidor.equals(c.tipoCompetidor)) {
 			throw new Exception("No se puede agregar un personaje/liga a una liga con distintos tipos de competidor"); 
 		}
-		
+		if(this.equals(c)){  // esta misma liga
+			throw new Exception("Esta es la misma liga a la que esta agregando competidores!"); 
+		}
 		if(!c.puedeEntrarEnLiga()){
 			throw new Exception("Este personaje ya pertenece a una liga");
 		}
@@ -62,25 +72,31 @@ public class Liga extends Competidor {
 	
 	private void updateCacheCaracteristicas() {
 		int cantComp = this.getCantidadCompetidores();
-		for (Caracteristica c : Caracteristica.values()) {
-			int value = this.getSumaCaracteristica(c) / cantComp;
-			cache_promedio_caracteristicas.put(c, value);
+		if(cantComp!=0) {											//si la cantidad de competidores no es 0
+			for (Caracteristica c : Caracteristica.values()) {
+				int value = this.getSumaCaracteristica(c) / cantComp;
+				cache_promedio_caracteristicas.put(c, value);
+			}
 		}
 	}
 	
 	@Override
 	protected int getCantidadCompetidores() {
 		int sum = 0;
-		for(Competidor comp : competidores) {
-			sum += comp.getCantidadCompetidores();
+		if(!this.competidores.isEmpty())  {      //si no hay competidores cargados devuelve 0
+			for(Competidor comp : competidores) {
+				sum += comp.getCantidadCompetidores();
+			}
 		}
 		return sum;
 	}
 	
 	protected int getSumaCaracteristica(Caracteristica c) {
 		int sum = 0;
-		for(Competidor comp : competidores) {
-			sum += comp.getSumaCaracteristica(c);
+		if(!this.competidores.isEmpty())  {				//si no hay competidores cargados devuelve 0
+			for(Competidor comp : competidores) {
+				sum += comp.getSumaCaracteristica(c);
+			}
 		}
 		return sum;
 	}
@@ -94,22 +110,9 @@ public class Liga extends Competidor {
 		return nombreLiga;
 	}
 	
-	public void agregarCompetidorALiga() {
-		// Agrega personaje o liga a otra liga
-	}
-	
 	// Getters y Setters
 	public String getNombre() {
 		return nombreLiga;
-	}
-	
-	@Override
-	protected int getCantidadCompetidores() {
-		int sum = 0;
-		for(Competidor comp : competidores) {
-			sum += comp.getCantidadCompetidores();
-		}
-		return sum;
 	}
 	
 	public void setCompetidores(List<Competidor> competidores) {
@@ -120,13 +123,13 @@ public class Liga extends Competidor {
 		return tipoCompetidor;
 	}
 
+	// VER -> metodo getNombre
 	public String toFileLine() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.nombreLiga);
-		for (Competidor c : competidores) {
-			sb.append(", " + c.getNombre());
-		}
+//		for (Competidor c : competidores) {
+//			sb.append(", " + c.getNombre());
+//		}
 		return sb.toString();
 	}
-	
 }

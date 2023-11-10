@@ -76,11 +76,11 @@ public class Juego {
             switch (seleccion) {
                 case 1:
                 	try {
-                		this.personajes = cargarPersonajesDesdeArchivo("src/personajes.in");
+                		this.personajes = cargarPersonajesDesdeArchivo("archivos/personajes.in");
                 	} catch (FileNotFoundException e) {
-						// manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
+                		System.err.println(e.getMessage()); // manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
 					} catch (IOException e) {
-						// Este por si falla la lectura del archvo  
+						System.err.println(e.getMessage()); // Este por si falla la lectura del archvo  
 					}
                     break;
                 case 2:
@@ -95,10 +95,9 @@ public class Juego {
  					break;
                 case 4:
 					try {
-						guardarPersonajesEnArchivo(this.personajes, "src/personajes.in");
+						guardarPersonajesEnArchivo(this.personajes, "archivos/personajes.in");
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.err.println(e.getMessage());
 					}
                     break;
                 case 5:
@@ -129,7 +128,7 @@ public class Juego {
 	            	caract.put(Caracteristica.RESISTENCIA, 	Integer.valueOf(atributos[5].trim()));
 	            	caract.put(Caracteristica.DESTREZA, 	Integer.valueOf(atributos[6].trim()));
 	            	
-	            	if (atributos[0].equals("Héroe")) {
+	            	if (atributos[0].equals("Heroe")) {
 	            		heovi = TipoCompetidor.HEROE;
 	            	} else if (atributos[0].equals("Villano")) {
 	            		heovi = TipoCompetidor.VILLANO;
@@ -138,12 +137,11 @@ public class Juego {
 	            		return null; 
 	            	}
 	            	
-	            	Personaje p = new Personaje(atributos[1], atributos[2], caract, heovi);
+	            	Personaje p = new Personaje(atributos[1].trim(), atributos[2].trim(), caract, heovi);
 	            	
 	            	listaPersonaje.add(p);
 	            }
-	            
-	            br.close();
+	            System.out.println("Personajes cargados correctamente");	            
 	            
 		} catch (FileNotFoundException e) {	        	
 			throw new FileNotFoundException("No se pudo encontrar el archivo: " + path);
@@ -163,6 +161,7 @@ public class Juego {
 				writer.write(personaje.toFileLine());
 				writer.newLine();
 			}
+			System.out.println("Personajes guardados correctament");	 
         }catch (IOException e) {
         	throw new IOException("Error al leer o escribir el archivo");
         }
@@ -312,13 +311,13 @@ public class Juego {
             int seleccion = scanner.nextInt();
 
             switch (seleccion) {
-                case 1:
+                case 1:          	
                 	try {
-                		this.ligas = cargarLigasDesdeArchivo(this.personajes, "src/ligas.in");
+                		this.ligas = cargarLigasDesdeArchivo(this.personajes, "archivos/ligas.in");
             		}catch (FileNotFoundException e) {
-            			// Manejo del error. yo devuelvo una excepcion, este por si no esta el archivo 
+            			System.err.println(e.getMessage());
             		}catch (IOException e) {
-            			// Este por si falla la lectura del archvo  
+            			System.err.println(e.getMessage());
             		}
                 	break;
                 case 2:
@@ -333,10 +332,9 @@ public class Juego {
                     break;
                 case 4:
 					try {
-						guardarLigasEnArchivo(this.ligas,"src/ligas.in");
+						guardarLigasEnArchivo(this.ligas,"archivos/ligas.in");
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.err.println(e.getMessage());
 					}
                     break;
                 case 5:
@@ -384,12 +382,15 @@ public class Juego {
 						}
             		}
 				}
-            	
+     
             	// Ver que estoy mandando en heovi, pareciera que estoy mandando por defecto heovi = villano
             	if(!competidores.isEmpty()) {
             		listaLiga.add(new Liga(ligaString[0], competidores, heovi));
             	}          
+            	
+            	
             }
+       	 System.out.println("Ligas cargados correctamente");	
             
         } catch (FileNotFoundException e) {	        	
         	throw new FileNotFoundException("No se pudo encontrar el archivo: "+ path);     	
@@ -406,7 +407,7 @@ public class Juego {
 				writer.write(liga.toFileLine());
 				writer.newLine();
 			}			
-			
+			System.out.println("Ligas guardadas correctamente");	
         }catch (IOException e) {
         	throw new IOException("Error al leer o escribir el archivo");
         }

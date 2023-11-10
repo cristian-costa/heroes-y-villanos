@@ -112,14 +112,19 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	public TipoCompetidor isTipoCompetidor() {
 		return tipoCompetidor;
 	}
+	
+	@Override
+	protected String getNombreParaArchivo() {
+		return nombreLiga;
+	}
 
 	// VER -> metodo getNombre
 	public String toFileLine() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.nombreLiga);
-//		for (Competidor c : competidores) {
-//			sb.append(", " + c.getNombre());
-//		}
+		for (Competidor c : competidores) {
+			sb.append(", " + c.getNombreParaArchivo());
+		}
 		return sb.toString();
 	}
 }

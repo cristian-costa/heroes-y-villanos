@@ -81,6 +81,12 @@ public class Personaje extends Competidor {
 	public void setTipoCompetidor(TipoCompetidor tipoCompetidor) {
 		this.tipoCompetidor = tipoCompetidor;
 	}
+		
+	@Override
+	protected String getNombreParaArchivo() {
+		// TODO Auto-generated method stub
+		return this.nombreFantasia;
+	}
 	
 	public String toFileLine() {
 		String str = "";

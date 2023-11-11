@@ -62,7 +62,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	}
 	
 	@Override
-	protected int getPromedioCaracteristica(Caracteristica c) {
+	protected int getPromedioCaracteristica(Caracteristica c) throws NullPointerException{
 		return cache_promedio_caracteristicas.get(c);
 	}
 	

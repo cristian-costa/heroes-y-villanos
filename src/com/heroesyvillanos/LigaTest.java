@@ -103,6 +103,42 @@ class LigaTest {
 	}
 	
 	@Test
+	void testExceptionAgregarLigaALigaHija() {
+		String nombreLiga1 = "Liga_1";
+		String nombreLiga2 = "Liga_2";
+		String nombreLiga3 = "Liga_3";
+		TipoCompetidor tipo = TipoCompetidor.HEROE;
+		Map<Caracteristica, Integer> caracteristicas = Map.ofEntries(
+				Map.entry(Caracteristica.VELOCIDAD, 10),
+				Map.entry(Caracteristica.FUERZA, 10),
+				Map.entry(Caracteristica.RESISTENCIA, 10),
+				Map.entry(Caracteristica.DESTREZA, 10)
+			);
+		Competidor comp_1 = new Personaje("peter", "spider-man", caracteristicas, tipo);
+		Competidor comp_2 = new Personaje("tony", "iron-man", caracteristicas, tipo);
+		Competidor comp_3 = new Personaje("cap", "cap-america", caracteristicas, tipo);
+		
+		try {
+			Liga liga_padre = new Liga(nombreLiga1, tipo);
+			Liga liga_hija = new Liga(nombreLiga2, tipo);
+			Liga liga_nieta = new Liga(nombreLiga3, tipo);
+			
+			liga_padre.agregarCompetidorALiga(comp_1);
+			liga_hija.agregarCompetidorALiga(comp_2);
+			liga_nieta.agregarCompetidorALiga(comp_3);
+			
+			liga_padre.agregarCompetidorALiga(liga_hija);
+			liga_hija.agregarCompetidorALiga(liga_nieta);
+			
+			liga_nieta.agregarCompetidorALiga(liga_padre);
+		}
+		catch(Exception e) {
+			return;
+		}
+		fail();
+	}	
+	
+	@Test
 	void testExceptionAgregarCompetidorDistintoTipoALiga() {
 		String nombreLiga = "Marvel";		
 		TipoCompetidor tipo = TipoCompetidor.HEROE;

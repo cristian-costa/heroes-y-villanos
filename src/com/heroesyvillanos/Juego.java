@@ -129,7 +129,7 @@ public class Juego {
 	            	caract.put(Caracteristica.RESISTENCIA, 	Integer.valueOf(atributos[5].trim()));
 	            	caract.put(Caracteristica.DESTREZA, 	Integer.valueOf(atributos[6].trim()));
 	            	
-	            	if (atributos[0].equals("Héroe")) {
+	            	if (atributos[0].equals("Heroe")) {
 	            		heovi = TipoCompetidor.HEROE;
 	            	} else if (atributos[0].equals("Villano")) {
 	            		heovi = TipoCompetidor.VILLANO;
@@ -461,7 +461,6 @@ public class Juego {
 
 		// AGREGO PERSONAJE O LIGA
 		seleccionaCompetidorAAgregar(indexLiga);
-
 	}
 	
 	private void ingresaNombreLigaAgregaCompetidor() throws Exception{
@@ -512,7 +511,6 @@ public class Juego {
 			case 2:
 				if (ligas.size()>1 ) {  //la unica liga cargada es la actual
 					scanner.nextLine();
-					
 					agregaLigaALiga(indexLiga);
 				}
 				else
@@ -528,12 +526,9 @@ public class Juego {
 				}
 			}
 		} while (seguir);
-
-		
 	}
 	
 	private void agregaPersonajeALiga(int indexLiga) throws Exception {
-
 		boolean seguir=true;
 		int indicePersonaje;
 		
@@ -560,9 +555,9 @@ public class Juego {
 	}
 	
 	private void agregaLigaALiga(int indexLiga) throws Exception {
-
 		boolean seguir=true;
 		int indiceLigaAgregar;
+    
 		this.listarLigas();
 		System.out.println("Ingrese el numero de liga que desea agregar: ");
 		indiceLigaAgregar = scanner.nextInt();

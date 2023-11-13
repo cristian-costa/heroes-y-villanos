@@ -1,7 +1,9 @@
-package com.heroesyvillanos;
+package com.heroesyvillanos.test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+
+import com.heroesyvillanos.*;
 
 class PersonajeTest {
 

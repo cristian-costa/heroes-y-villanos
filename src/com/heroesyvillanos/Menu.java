@@ -90,32 +90,32 @@ public class Menu {
 	}
 	
 	private void mostrarMenuEnConsola(String titulo, ArrayList<String> opciones, String seleccion) {
-		System.out.println("");
-		System.out.println(titulo);
+		animarTexto("");
+		animarTexto(titulo);
 		for(String opcion : opciones) {
-			System.out.println(opcion);
+			animarTexto(opcion);
 		}
-		System.out.println(seleccion);
+		animarTexto(seleccion);
 		
 	}
 	
 	private void mostrarMenuEnConsola(String instruccion, ArrayList<String> opciones) {
-		System.out.println("");
-		System.out.println(instruccion);
+		animarTexto("");
+		animarTexto(instruccion);
 		for(String opcion : opciones) {
-			System.out.println(opcion);
+			animarTexto(opcion);
 		}
 		
 	}
 	
 	private void mostrarTextoEnConsola(String s) {
-		System.out.println("");
-		System.out.println(s);
+		animarTexto("");
+		animarTexto(s);
 		
 	}
 	
 	private void mostrarTextoEnConsolaSinSeparacion(String s) {
-		System.out.println(s);
+		animarTexto(s);
 		
 	}
 	
@@ -357,6 +357,26 @@ public class Menu {
 	public void throwException(String nombreMenu, String s2) throws Exception{
 		String s1 = bundle.getString(nombreMenu + ".exception");
 		throw new Exception(s1 + s2);
+	}
+	
+	private void animarTexto(String text) {
+		if (text.isBlank()) {
+			try{
+		        Thread.sleep(100);//pausa entre caracteres
+		    }catch(InterruptedException ex){
+		        Thread.currentThread().interrupt();
+		    }
+		}
+		int i;
+		for(i = 0; i < text.length(); i++){
+		    System.out.printf("%c", text.charAt(i));
+		    try{
+		        Thread.sleep(5);//pausa entre caracteres
+		    }catch(InterruptedException ex){
+		        Thread.currentThread().interrupt();
+		    }
+		}
+		System.out.printf("%n");
 	}
 
 }

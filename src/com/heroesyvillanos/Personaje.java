@@ -28,6 +28,7 @@ public class Personaje extends Competidor {
 	}
 	
 	// Getters y Setters -> nombre
+
 	public String getNombre() {
 		return nombre;
 	}
@@ -80,6 +81,12 @@ public class Personaje extends Competidor {
 	public void setTipoCompetidor(TipoCompetidor tipoCompetidor) {
 		this.tipoCompetidor = tipoCompetidor;
 	}
+		
+	@Override
+	protected String getNombreParaArchivo() {
+		// TODO Auto-generated method stub
+		return this.nombreFantasia;
+	}
 	
 	public String toFileLine() {
 		String str = "";
@@ -93,3 +100,4 @@ public class Personaje extends Competidor {
 		return str + ", " + this.nombre +", "+ this.nombreFantasia+", "+this.caracteristicas.get(Caracteristica.VELOCIDAD)+", "+this.caracteristicas.get(Caracteristica.FUERZA)+", "+this.caracteristicas.get(Caracteristica.RESISTENCIA)+", "+this.caracteristicas.get(Caracteristica.DESTREZA);
 	}
 }
+

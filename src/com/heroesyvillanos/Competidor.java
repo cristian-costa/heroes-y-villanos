@@ -8,6 +8,7 @@ public abstract class Competidor implements Comparable<Competidor> {
 	abstract protected int getPromedioCaracteristica(Caracteristica c);
 	abstract protected int getSumaCaracteristica(Caracteristica c);
 	abstract protected int getCantidadCompetidores();
+	abstract protected String getNombreParaArchivo();
 	
 	protected boolean esNombreValido(String name) {
 		if(name.length() == 0) return false;

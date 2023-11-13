@@ -56,7 +56,7 @@ public abstract class Competidor implements Comparable<Competidor> {
 	public int compareTo(Competidor c) {
 		int resultado = 0;
 		
-		for (Caracteristica caracteristicaDeComparacion : orden.ordenCaracteristicas) {
+		for (Caracteristica caracteristicaDeComparacion : orden.getOrdenCaracteristicas()) {
 			resultado =
 				this.getPromedioCaracteristica(caracteristicaDeComparacion) -
 				c.getPromedioCaracteristica(caracteristicaDeComparacion);

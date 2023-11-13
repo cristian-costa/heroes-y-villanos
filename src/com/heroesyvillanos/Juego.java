@@ -615,8 +615,15 @@ public class Juego {
             System.out.println("2. Ver reglas de combate");
             System.out.println("3. Regresar al Menú Principal");
             System.out.print("Seleccione una opción: ");
-
-            int seleccion = scanner.nextInt();
+            int seleccion = 0;
+            
+            try {
+				 seleccion = scanner.nextInt();
+			} catch (Exception e) {
+				scanner.nextLine();
+				seguir = true;
+			}
+            
 
             switch (seleccion) {
                 case 1:
@@ -644,8 +651,10 @@ public class Juego {
         	Competidor comp2 = seleccionarCompetidor();
         	Caracteristica car = seleccionarCaracteristica();
         	combatir(comp1, comp2, car);
+		} catch (NullPointerException e) {
+			System.out.println("No se puede combatir con una liga vacía");
+			System.out.println("Regresando al menú de combates");
 		} catch (Exception e) {
-			// TODO: handle exception
 			System.out.println(e.getMessage());
 			System.out.println("Regresando al menú de combates");
 		}

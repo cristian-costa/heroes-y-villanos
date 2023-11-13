@@ -10,107 +10,74 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.LinkedList;
 import java.util.Collections;
 
 public class Juego {
 	private List<Personaje> personajes = new ArrayList<Personaje>();
 	private List<Liga> ligas = new ArrayList<Liga>();
-    private Scanner scanner = new Scanner(System.in);
+    private Menu menu = new Menu();
     
-    public void mostrarMenu() throws Exception {
-        boolean continuar = true;
-
-        while(continuar) {
-            System.out.println("");
-            System.out.println("===== Menú Principal =====");
-            System.out.println("1. Administración de Personajes");
-            System.out.println("2. Administración de Ligas");
-            System.out.println("3. Realización de combates");
-            System.out.println("4. Reportes");
-            System.out.println("5. Salir");
-            System.out.print("Seleccione una opción: ");
-
-            int opcion = scanner.nextInt();
-
-            switch(opcion) {
-                case 1:
-                    menuPersonajes();
-                    break;
-                case 2:
-                    menuLigas();
-                    break;
-                case 3:
-                    menuCombates();
-                    break;
-                case 4:
-                    menuReportes();
-                    break;
-                case 5:
-                    continuar = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
-            }
-        }
+    private static final String pathPersonajesIn = "src/personajes.in";
+    private static final String pathLigasIn = "src/ligas.in";
+    
+    public void bienvenida() {
+    	menu.mostrarBienvenida();
+    }
+    public void menuPrincipal(){
+    	int seleccion = menu.mostrarMenuConTituloOpcionesSeleccion("menuPrincipal");
+    	
+    	try {
+    		switch(seleccion) {
+		        case 1:
+		            menuPersonajes();
+		            break;
+		        case 2:
+		            menuLigas();
+		            break;
+		        case 3:
+		            menuCombates();
+		            break;
+		        case 4:
+		            menuReportes();
+		            break;
+		        case 5:
+		        	System.exit(0);
+		            break;
+	    	}
+		} catch (Exception e) {
+			menu.mostrarTextoExcepcion(e);
+		}
     }
     
  // ========== INICIO MENU PERSONAJES ==========
     
-    private void menuPersonajes() {
-        boolean seguir = true;
+    private void menuPersonajes() throws Exception{
+    	int seleccion = menu.mostrarMenuConTituloOpcionesSeleccion("menuPersonajes");
 
-        while (seguir) {
-            System.out.println("");
-            System.out.println("===== Administración de Personajes =====");
-            System.out.println("1. Carga desde archivo");
-            System.out.println("2. Creación");
-            System.out.println("3. Listado");
-            System.out.println("4. Guardar en archivo todos los personajes");
-            System.out.println("5. Regresar al Menú Principal");
-            System.out.print("Seleccione una opción: ");
-
-            int seleccion = scanner.nextInt();
-
-            switch (seleccion) {
-                case 1:
-                	try {
-                		this.personajes = cargarPersonajesDesdeArchivo("src/personajes.in");
-                	} catch (FileNotFoundException e) {
-						// manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
-					} catch (IOException e) {
-						// Este por si falla la lectura del archvo  
-					}
-                    break;
-                case 2:
-                    crearPersonaje();
-                    break;
-                case 3:
- 					try {
- 						listarPersonajes();
- 					} catch (Exception e) {
- 						System.out.println(e.getMessage());
- 					}
- 					break;
-                case 4:
-					try {
-						guardarPersonajesEnArchivo(this.personajes, "src/personajes.in");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-                    break;
-                case 5:
-                    seguir = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
-            }
+        switch (seleccion) {
+            case 1:
+        		this.personajes = cargarPersonajesDesdeArchivo(pathPersonajesIn);
+                break;
+            case 2:
+                crearPersonaje();
+                break;
+            case 3:
+            	menu.mostrarTitulo("listarPersonajes");
+				listarPersonajes();
+				break;
+            case 4:
+				guardarPersonajesEnArchivo(this.personajes, pathPersonajesIn);
+                break;
+            case 5:
+            	menuPrincipal();
+                break;
         }
     }
         
-	public ArrayList<Personaje> cargarPersonajesDesdeArchivo(String path) throws IOException {
+	private ArrayList<Personaje> cargarPersonajesDesdeArchivo(String path) throws Exception {
+		
+		menu.mostrarTitulo("cargarPersonajes");
 		// Inicializo array de personajes
 		ArrayList<Personaje> listaPersonaje = new ArrayList<Personaje>();
 		
@@ -134,8 +101,7 @@ public class Juego {
 	            	} else if (atributos[0].equals("Villano")) {
 	            		heovi = TipoCompetidor.VILLANO;
 	            	} else {
-	            		System.err.println("NO EXISTE TIPO DE PARTICIPANTE");
-	            		return null; 
+	            		menu.throwException("tipoCompetidor");
 	            	}
 	            	
 	            	Personaje p = new Personaje(atributos[1], atributos[2], caract, heovi);
@@ -145,16 +111,19 @@ public class Juego {
 	            
 	            br.close();
 	            
-		} catch (FileNotFoundException e) {	        	
-			throw new FileNotFoundException("No se pudo encontrar el archivo: " + path);
+		} catch (FileNotFoundException e) {	
+			menu.throwException("fileNotFound", path);
 		} catch (IOException e) {
-			throw new IOException("Error al leer o escribir el archivo");
+			menu.throwException("io");
 		}
 	        
+		menu.mostrarFinal("cargarPersonajes");
+		
 		return listaPersonaje;
 	}
 	
-	public void guardarPersonajesEnArchivo(List<Personaje> lista, String path) throws IOException {
+	private void guardarPersonajesEnArchivo(List<Personaje> lista, String path) throws Exception {
+		menu.mostrarTitulo("guardarPersonajes");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
 			
 			writer.write("Héroe/Villano, NombreReal, NombrePersonaje, Velocidad, Fuerza, Resistencia, Destreza");
@@ -164,129 +133,62 @@ public class Juego {
 				writer.newLine();
 			}
         }catch (IOException e) {
-        	throw new IOException("Error al leer o escribir el archivo");
+        	menu.throwException("io");
         }
+		menu.mostrarFinal("guardarPersonajes");
 	}
 	
-	public void crearPersonaje() {
-		boolean seguir;
+	private void crearPersonaje() throws Exception{
+		boolean error;
 		TipoCompetidor tipo;
 		String nombreFantasia = "";
 		String nombreReal = "";
-		Map<Caracteristica, Integer> mapCaracteristicas = new HashMap<>();;
+		Map<Caracteristica, Integer> mapCaracteristicas = new HashMap<>();
 		
-        System.out.println("");
-		System.out.println("Creando personaje...");
-	
+		menu.mostrarTitulo("crearPersonaje");
+		error = false;
+		
 		do {
-			System.out.println("Ingrese nombre de fantasía: ");
-			seguir = true;
-			scanner.nextLine(); // consumir enter pendiente de nextInt()
-			
-			while (seguir) {
-				seguir = false;
-				nombreFantasia = scanner.nextLine();
+			nombreFantasia = menu.registrarPalabra("crearPersonajeNombreFantasia", error);
+			error = false;
 
-				if (!personajes.isEmpty()) {
-					for (Personaje personaje : personajes) {
-						if (personaje.getNombreFantasia().equals(nombreFantasia)) {
-							System.out.println("Personaje ya existente, ingrese nuevamente: ");
-							seguir = true;
-							break;
-						}
+			if(nombreFantasia.isBlank()) {
+				error = true;
+			}
+			if (!personajes.isEmpty()) {
+				for (Personaje personaje : personajes) {
+					if (personaje.getNombreFantasia().equals(nombreFantasia)) {
+						error = true;
+						break;
 					}
 				}
-			}
+			} 
+		} while (error);
 			
-			tipo = ingresoTipo("Personaje");
-
-			System.out.println("");
-			System.out.println("Ingrese nombre real: ");
-
-			// seguir = true;
-			// while (seguir = true) {
-				// seguir = false;
-				nombreReal = scanner.nextLine();
-			// }
-
-			System.out.println("");
-			System.out.println("Ingrese valores para las características: ");
-
-			Caracteristica[] caracteristicas = Caracteristica.values();
-
-			for (int i = 0; i < caracteristicas.length; i++) {
-				System.out.println((i + 1) + ". " + caracteristicas[i] + " valor: ");
-				seguir = true;
-				int valor;
-				
-				while (seguir) {
-					try {
-						valor = scanner.nextInt();
-						if (valor > 0) {
-							seguir = false;
-							mapCaracteristicas.put(caracteristicas[i], valor);
-						} else {
-							System.out.println("Valor incorrecto, intente nuevamente: ");
-						}
-					} catch(Exception E) {
-						scanner.nextLine();
-						System.out.println("Valor incorrecto, intente nuevamente: ");
-						seguir = true;
-					}
-				}
-			}
-
-			seguir = false;
-			
-			try {
-				personajes.add(new Personaje(nombreReal, nombreFantasia, mapCaracteristicas, tipo)); 
-			} catch (Exception E) {
-				System.out.println(E.getMessage() + " PRESIONE ENTER PARA REINGRESAR DATOS... ");
-				seguir = true;
-			}
-		} while (seguir);
-
-		System.out.println("PERSONAJE CREADO EXITOSAMENTE!");
-	}
-	
-	private TipoCompetidor ingresoTipo(String s) {
-		boolean seguir;
-		TipoCompetidor tipo = TipoCompetidor.HEROE;
-		int aux=0;
+		tipo = menu.ingresoTipo(true);
 		
-		System.out.print("Ingrese tipo de " + s +"(1)Heroe / (2)Villano : ");
+		error = false;
+		
 		do {
-			seguir = false;
-			try { // MANEJO DE EXCEPCION PARA EL CASO DE INGRESO DE STRING
-				aux = Integer.parseInt(scanner.nextLine()); // LO LEO COMO STRING PARA QUE LEA TODA LA LINEA Y NO DEJE NADA EN EL BUFFER
-				while (aux != 1 && aux != 2) {
-					System.out.print("La opcion ingresada es incorrecta, ingrese 1 para Heroe o 2 para Villano : ");
-					aux = Integer.parseInt(scanner.nextLine());
-				}
-				if (aux == 1)
-					tipo = TipoCompetidor.HEROE;
-				if (aux == 2)
-					tipo = TipoCompetidor.VILLANO;
-
-			} catch (Exception ex) {
-				System.out.print("La opcion ingresada es incorrecta, ingrese 1 para Heroe o 2 para Villano : ");
-				seguir = true;
+			nombreReal = menu.registrarPalabra("crearPersonajeNombreReal", error);
+			error = false;
+			if(nombreReal.isBlank()) {
+				error = true;
 			}
-		} while (seguir == true);
+		} while (error);
+			
+		mapCaracteristicas = menu.registrarCaracteristicas();
+	
+		personajes.add(new Personaje(nombreReal, nombreFantasia, mapCaracteristicas, tipo));
 		
-		return tipo;
+		menu.mostrarFinal("crearPersonaje");
 	}
 	
-	public void listarPersonajes() throws Exception {
+	private void listarPersonajes() throws Exception {
 		if (!personajes.isEmpty()) {
-			System.out.println("");
-			System.out.println("Listando personajes...");
-			
-			for (int i = 0; i < personajes.size(); i++) {
-				System.out.println((i+1) + ". " + personajes.get(i));
-			}
+			menu.listarCompetidores(personajes);
 		} else {
-			throw new Exception("La lista de personajes está vacía."); 
+			menu.throwException("listaPersonajesVacia");
 		}		
 	}
 	
@@ -295,68 +197,38 @@ public class Juego {
 	// ========== INICIO MENU LIGAS ==========
 
     private void menuLigas() throws Exception {
-        boolean seguir = true;
+    	
+    	int seleccion = menu.mostrarMenuConTituloOpcionesSeleccion("menuLigas");
 
-        while (seguir) {
-            System.out.println("");
-            System.out.println("===== Administración de Ligas =====");
-            System.out.println("1. Carga desde archivo");
-            System.out.println("2. Creación");
-            System.out.println("3. Listado");
-            System.out.println("4. Guardar en archivo todas las ligas");
-            System.out.println("5. Agregar Personajes a Liga");
-            System.out.println("6. Agregar Liga a Liga");
-            System.out.println("7. Regresar al Menú Principal");
-            System.out.print("Seleccione una opción: ");
-
-            int seleccion = scanner.nextInt();
-
-            switch (seleccion) {
-                case 1:
-                	try {
-                		this.ligas = cargarLigasDesdeArchivo(this.personajes, "src/ligas.in");
-            		}catch (FileNotFoundException e) {
-            			// Manejo del error. yo devuelvo una excepcion, este por si no esta el archivo 
-            		}catch (IOException e) {
-            			// Este por si falla la lectura del archvo  
-            		}
-                	break;
-                case 2:
-                    crearLiga();
-                    break;
-                case 3:
-					try {
-						listarLigas();
-					} catch (Exception e) {
-						System.out.println(e.getMessage());
-					}
-                    break;
-                case 4:
-					try {
-						guardarLigasEnArchivo(this.ligas,"src/ligas.in");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-                    break;
-                case 5:
-                	scanner.nextLine();
-                	agregaCompetidorALiga(1); // Agrega personaje
-                    break;
-                case 6:
-                	scanner.nextLine();
-                	agregaCompetidorALiga(2); // Agrega Liga
-                    break;
-                case 7:
-                    seguir = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
-            }
+        switch (seleccion) {
+            case 1:
+        		this.ligas = cargarLigasDesdeArchivo(this.personajes, pathLigasIn);
+            	break;
+            case 2:
+                crearLiga();
+                break;
+            case 3:
+            	menu.mostrarTitulo("listarLigas");
+				listarLigas();
+                break;
+            case 4:
+				guardarLigasEnArchivo(this.ligas, pathLigasIn);
+                break;
+            case 5:
+            	agregaCompetidorALiga(1); // Agrega personaje
+                break;
+            case 6:
+            	agregaCompetidorALiga(2); // Agrega Liga
+                break;
+            case 7:
+            	menuPrincipal();
+                break;
         }
     }
     
-	public ArrayList<Liga> cargarLigasDesdeArchivo(List<Personaje>listPersonaje, String path) throws Exception {
+	private ArrayList<Liga> cargarLigasDesdeArchivo(List<Personaje>listPersonaje, String path) throws Exception {
+		
+		menu.mostrarTitulo("cargarLigas");
 		ArrayList<Liga> listaLiga = new ArrayList<Liga>();
 		
         try (
@@ -392,15 +264,17 @@ public class Juego {
             }
             
         } catch (FileNotFoundException e) {	        	
-        	throw new FileNotFoundException("No se pudo encontrar el archivo: "+ path);     	
+        	menu.throwException("fileNotFound", path);  	
         } catch (IOException e) {
-        	throw new IOException("Error al leer o escribir el archivo");
+        	menu.throwException("io");
         }
         
+        menu.mostrarFinal("cargarLigas");
 		return listaLiga;
 	}
 	
-	public void guardarLigasEnArchivo(List<Liga> lista, String path) throws IOException {
+	private void guardarLigasEnArchivo(List<Liga> lista, String path) throws Exception {
+		menu.mostrarTitulo("guardarLigas");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
 			for (Liga liga : lista) {
 				writer.write(liga.toFileLine());
@@ -408,11 +282,12 @@ public class Juego {
 			}			
 			
         }catch (IOException e) {
-        	throw new IOException("Error al leer o escribir el archivo");
+        	menu.throwException("io");
         }
+		menu.mostrarFinal("guardarLigas");
 	}
 	
-	private boolean validaCadena(String s) {
+	private boolean cadenaValida(String s) {
 		if (s.isBlank() || s.isEmpty())
 			return false;
 		return true;
@@ -426,170 +301,96 @@ public class Juego {
 		return false;
 	}
 	
-	public void crearLiga() {
-		System.out.println("");
-		System.out.println("Creando liga...");
+	private void crearLiga() throws Exception{
 		String nombreLiga;
-		boolean valido, seguir;
 		TipoCompetidor tipoLiga;
-		int indexLiga, opcion;
-		scanner.nextLine();
-
+		int indexLiga;
+		boolean error;
+		
+		menu.mostrarTitulo("crearLiga");
+		error = false;
+		
 		do {
-			// INGRESO NOMBRE de LIGA
-			System.out.print("Ingrese nombre de la nueva Liga: ");
-			nombreLiga = scanner.nextLine();
+			nombreLiga = menu.registrarPalabra("crearLigaNombreLiga", error);
+			error = false;
 
-			do {
-				valido = true;
-				if (!validaCadena(nombreLiga) || existeLigaEnMemoria(nombreLiga)) {
-					System.out.print("El nombre de Liga ingresado no es valido o ya fue cargado ingrese uno valido: ");
-					nombreLiga = scanner.nextLine();
-					valido = false;
-				}
-
-			} while (!valido);
-
-			tipoLiga = ingresoTipo("Liga");
-
-			try { // creo liga vacia
-				ligas.add(new Liga(nombreLiga, tipoLiga));
-				seguir = false;
-			} catch (Exception E) {
-				System.out.println(E.getMessage() + " Debe reingresar datos...");
-				seguir = true;
+			if (!cadenaValida(nombreLiga) || existeLigaEnMemoria(nombreLiga)) {
+				error = true;
 			}
-
-		} while (seguir);
+		} while (error);
+		
+		tipoLiga = menu.ingresoTipo(false);
+		
+		ligas.add(new Liga(nombreLiga, tipoLiga));
+		
+		menu.mostrarFinal("crearLiga");
 		
 		indexLiga = ligas.size() - 1;
 
 		// AGREGO PERSONAJE O LIGA
+		int seleccion = menu.mostrarMenuConTituloOpcionesSeleccion("crearLigaAgregarCompetidor");
 
-		do {
-			seguir = false;
-			System.out.println("AGREGAR COMPETIDORES A LA LIGA...... '" + nombreLiga + "'....... ");
-			System.out.println(" 1. Agregar un Personaje");
-			System.out.println(" 2. Agregar una Liga");
-			System.out.println(" 3. Volver al menu de Ligas: ");
-
-			opcion = scanner.nextInt();
-			switch (opcion) {
-			case 1:
-				if (!personajes.isEmpty()) {
-					scanner.nextLine();
-					agregaPersonajeALiga(indexLiga);
-					seguir = true;
-				}
-				else
-					System.out.println("NO HAY PERSONAJES EN MEMORIA");
-				seguir=true;
-				break;
-			case 2:
-				if (ligas.size()>1 ) {  //la unica liga cargada es la actual
-					scanner.nextLine();
-					agregaLigaALiga(indexLiga);
-				}
-				else
-					System.out.println("NO HAY SUFICIENTES LIGAS CARGADAS");
-				seguir = true;
-				break;
-			case 3:
-				seguir = false;
-				break;
-			default: {
-				System.out.print("La opcion ingresada es incorrecta:");
-				seguir = true;
-				}
-			}
-		} while (seguir);
+		switch (seleccion) {
+        case 1:
+        	agregaPersonajeALiga(indexLiga);
+        	break;
+        case 2:
+        	agregaLigaALiga(indexLiga);
+            break;
+        case 3:
+			menuLigas();
+            break;
+		}
 	}
 	
-	private void agregaCompetidorALiga(int opcion) {
-		String nombreLiga;
-		int i;
+	private void agregaCompetidorALiga(int opcion) throws Exception{
 		
-		// INGRESO NOMBRE de LIGA
-		System.out.print("Ingrese nombre de la Liga para agregar Competidores: ");
-		nombreLiga = scanner.nextLine();
-
-		if (!validaCadena(nombreLiga) || !existeLigaEnMemoria(nombreLiga)) {
-			System.out.print("El nombre de Liga ingresado no es valido o no existe... ");
-		}
-		else {
-			for(i=0; i < this.ligas.size(); i++) {
-				if(ligas.get(i).getNombreLiga().equalsIgnoreCase(nombreLiga))
-					break;
-			}
-			
-			if(opcion==1)
-				agregaPersonajeALiga(i);
-			else
-				agregaLigaALiga(i);
-		}
-	}
-	
-	private void agregaPersonajeALiga(int indexLiga) {
-		String nombreFantasia;
-		boolean seguir;
-		int aux = 0;
-		System.out.println("Ingrese nombre de Personaje: ");
-		nombreFantasia = scanner.nextLine();
-		seguir = true;
+		menu.mostrarTitulo("ligaAgregarCompetidor");
 		
-		while (seguir && aux < personajes.size()) {
-			if (personajes.get(aux).getNombreFantasia().equalsIgnoreCase(nombreFantasia)) {
-				try {
-					ligas.get(indexLiga).agregarCompetidorALiga(personajes.get(aux));
-					System.out.println("Personaje CARGADO CORRECTAMENTE A LA LIGA");
-				} catch (Exception E) {
-					System.out.println(E.getMessage());
-				}
-				seguir = false;
-			}
-			else
-				aux++;
-		}
+		int seleccion = menu.seleccionarCompetidores(ligas);
 		
-		if(seguir)
-			System.out.println("No se encuentra el personaje...");
-	}
-	
-	private void agregaLigaALiga(int indexLiga) {
-		String nombreLiga;
-		boolean seguir;
-		int aux = 0;
-
-		System.out.println("Ingrese nombre de Liga: ");
-		nombreLiga = scanner.nextLine();
-		seguir = true;
-
-		while (seguir & aux < ligas.size()) {
-			if (ligas.get(aux).getNombreLiga().equalsIgnoreCase(nombreLiga)) {
-				try {
-					ligas.get(indexLiga).agregarCompetidorALiga(ligas.get(aux));
-					System.out.println("Liga CARGADA CORRECTAMENTE");
-
-				} catch (Exception E) {
-					System.out.println(E.getMessage());
-				}
-				seguir = false;
-			} else
-				aux++;
-		}
-		if (seguir)
-			System.out.println("No se encuentra la Liga... ");
-	}
-	
-	public void listarLigas() throws Exception{
-		if(!ligas.isEmpty()) {
-			System.out.println("");
-			System.out.println("Listando ligas...");
-			for (int i = 0; i < ligas.size(); i++) {
-				System.out.println((i+1) + ". " + ligas.get(i));
-			}
+		if(opcion == 1) {
+			agregaPersonajeALiga(seleccion);
 		} else {
-			throw new Exception("La lista de ligas está vacía."); 
+			agregaLigaALiga(seleccion);
+		}
+	}
+	
+	private void agregaPersonajeALiga (int indexLiga) throws Exception{
+		
+		menu.mostrarTitulo("ligaAgregarPersonaje");
+		
+		if (personajes.isEmpty()) {
+			menu.throwException("listaPersonajesVacia");
+		}
+		
+		int seleccion = menu.seleccionarCompetidores(personajes);
+		
+		ligas.get(indexLiga).agregarCompetidorALiga(personajes.get(seleccion - 1));
+		
+		menu.mostrarFinal("ligaAgregarPersonaje");
+	}
+	
+	private void agregaLigaALiga (int indexLiga) throws Exception {
+		
+		menu.mostrarTitulo("ligaAgregarLiga");
+
+		if (ligas.isEmpty()) {
+			menu.throwException("listaLigasVacia");
+		}
+		
+		int seleccion = menu.seleccionarCompetidores(ligas);
+		
+		ligas.get(indexLiga).agregarCompetidorALiga(ligas.get(seleccion - 1));
+		
+		menu.mostrarFinal("ligaAgregarLiga");
+	}
+	
+	private void listarLigas() throws Exception{
+		if(!ligas.isEmpty()) {
+			menu.listarCompetidores(ligas);
+		} else {
+			menu.throwException("listaLigasVacia");
 		}
 		
 	}
@@ -598,169 +399,97 @@ public class Juego {
 	
 	// ========== INICIO MENU COMBATES ==========
 
-    private void menuCombates() {
-        boolean seguir = true;
+    private void menuCombates() throws Exception{
+    	
+    	int seleccion = menu.mostrarMenuConTituloOpcionesSeleccion("menuCombates");
 
-        while (seguir) {
-            System.out.println("");
-            System.out.println("===== Combates =====");
-            System.out.println("1. Realizar combate");
-            System.out.println("2. Ver reglas de combate");
-            System.out.println("3. Regresar al Menú Principal");
-            System.out.print("Seleccione una opción: ");
-            int seleccion = 0;
-            
-            try {
-				 seleccion = scanner.nextInt();
-			} catch (Exception e) {
-				scanner.nextLine();
-				seguir = true;
-			}
-            
-
-            switch (seleccion) {
-                case 1:
-                	realizarCombateMenu();
-                    break;
-                case 2:
-                	mostrarReglas();
-                    break;
-                case 3:
-                    seguir = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
-            }
-        }
+    	switch (seleccion) {
+        case 1:
+        	menuRealizarCombate();
+            break;
+        case 2:
+        	mostrarReglas();
+            break;
+        case 3:
+            menuPrincipal();
+            break;
+    	}
     }
 
-    public void realizarCombateMenu() {
+    private void menuRealizarCombate() throws Exception{
     	try {
-    		System.out.println("");
-    		System.out.println("Elegir primer competidor:");
+    		menu.mostrarTitulo("realizarCombateComp1");
         	Competidor comp1 = seleccionarCompetidor();
-        	System.out.println("");
-    		System.out.println("Elegir segundo competidor:");
+        	menu.mostrarTitulo("realizarCombateComp2");
         	Competidor comp2 = seleccionarCompetidor();
         	Caracteristica car = seleccionarCaracteristica();
         	combatir(comp1, comp2, car);
 		} catch (NullPointerException e) {
-			System.out.println("No se puede combatir con una liga vacía");
-			System.out.println("Regresando al menú de combates");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("Regresando al menú de combates");
+			menu.throwException("combateLigaVacia");
 		}
     }
     
-    public Competidor seleccionarCompetidor() throws Exception {
-    	boolean seguir = true;
+    private Competidor seleccionarCompetidor() throws Exception {
     	int seleccionTipoCompetidor = 0;
     	int seleccionCompetidor = 0;
 
-        while (seguir) {
-            System.out.println("1. Personaje");
-            System.out.println("2. Liga");
-            System.out.print("Seleccione una opción: ");
-            
-            seleccionTipoCompetidor = scanner.nextInt();
-
-            switch (seleccionTipoCompetidor) {
-                case 1:
-                	listarPersonajes();
-                	seguir = false;
-                    break;
-                case 2:
-                	listarLigas();
-                	seguir = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
-            }
-        }
-        
-        seguir = true;
-        
-        while (seguir) {
-        	System.out.print("Seleccione una opción: ");
-        	
-        	seleccionCompetidor = scanner.nextInt();
-        	
-        	if ((seleccionTipoCompetidor == 1 && //Personaje
-        			(seleccionCompetidor < 1 || seleccionCompetidor > personajes.size())) || //Fuera de rango personaje
-        		(seleccionTipoCompetidor == 2 && //Liga
-        			(seleccionCompetidor < 1 || seleccionCompetidor > ligas.size()))) { //Fuera de rango liga
-        		System.out.println("Opción no válida. Intente de nuevo.");
-        	}
-        	else {
-        		seguir = false;
-        	}
-        }        
-        
-        System.out.println("Elegiste: " + (seleccionTipoCompetidor == 1 ? personajes.get(seleccionCompetidor - 1) : ligas.get(seleccionCompetidor - 1)));
+    	seleccionTipoCompetidor = menu.mostrarMenuConInstruccionOpciones("seleccionarTipoCompetidor");
+    	
+    	switch (seleccionTipoCompetidor) {
+        case 1:
+        	menu.mostrarTitulo("listarPersonajes");
+        	if (personajes.isEmpty()) {
+    			menu.throwException("listaPersonajesVacia");
+    		}
+        	//listarPersonajes();
+        	seleccionCompetidor = menu.seleccionarCompetidores(personajes);
+        	menu.mostrarResultado("seleccionarPersonaje", 1, personajes.get(seleccionCompetidor - 1).toString());
+            break;
+        case 2:
+        	menu.mostrarTitulo("listarLigas");
+        	if (ligas.isEmpty()) {
+    			menu.throwException("listaLigasVacia");
+    		}
+        	//listarLigas();
+        	seleccionCompetidor = menu.seleccionarCompetidores(ligas);
+        	menu.mostrarResultado("seleccionarLiga", 1, ligas.get(seleccionCompetidor - 1).toString());
+            break;
+    	}
+    	
         return seleccionTipoCompetidor == 1 ? personajes.get(seleccionCompetidor - 1) : ligas.get(seleccionCompetidor - 1);
     }
     
-    public Caracteristica seleccionarCaracteristica() {
-    	System.out.println("Características: ");
+    private Caracteristica seleccionarCaracteristica() {
     	Caracteristica[] caracteristicas = Caracteristica.values();
     	int seleccion = 0;
-    	listarCaracteristicas();
-    	System.out.println("");
-		System.out.println("Ingresar opción de característica elegida: ");
-		boolean seguir = true;
-
-        while (seguir) {
-        	seleccion = scanner.nextInt();
-        	if(seleccion < 0 || seleccion > caracteristicas.length) {
-        		System.out.println("Opción no válida. Intente de nuevo.");
-        	} else {
-        		seguir = false;
-        	}
-        }
+    	
+    	seleccion = menu.seleccionarCaracteristica();
         
-        System.out.println("Elegiste: " + caracteristicas[seleccion - 1]);
+    	
+        menu.mostrarResultado("seleccionarCaracteristica", 1, caracteristicas[seleccion - 1].toString());
         return caracteristicas[seleccion - 1];
     	
     }
     
-    public void listarCaracteristicas() {
-    	Caracteristica[] caracteristicas = Caracteristica.values();
-    	for(int i = 0; i < caracteristicas.length; i++) {
-    		System.out.println((i + 1) + ". " + caracteristicas[i]);
-    	}
-    }
-    
-	public void combatir(Competidor c1, Competidor c2, Caracteristica car) throws Exception {
-		// Toma dos competidores y una caracteristica
-		System.out.println("");
-		System.out.println("Combatiendo...");
+	private void combatir(Competidor c1, Competidor c2, Caracteristica car) throws Exception {
+		
+		menu.mostrarTitulo("combatir");
 		int resultado = c1.esGanador(c2, car);
 		
+		
 		if (resultado > 0) {
-			System.out.println("El ganador es: " + c1);
+			menu.mostrarResultado("combatir", 1, c1.toString()); //gana c1
 		} else if (resultado < 0) {
-			System.out.println("El ganador es: " + c2);
+			menu.mostrarResultado("combatir", 1, c2.toString()); //gana c2
 		} else {
-			System.out.println("La pelea termina en empate" );
+			menu.mostrarResultado("combatir", 2, ""); //empate
 		}
         
 	}
 	
-	public void mostrarReglas() {
-        System.out.println("");
-		System.out.println("===== Reglas de combate =====");
-		System.out.println("Para decidir quién es el ganador en un combate entre dos competidores se utiliza el valor de una de");
-		System.out.println("las características. En caso de empate, se decide por el valor de otra característica (en el orden ");
-		System.out.println("establecido, y volviendo a comenzar si fuera necesario).");
-		System.out.println("Por ejemplo: Si dos contendientes decidieran competir por Fuerza, y empatan, definen por ");
-		System.out.println("Resistencia. Si hubiera otro empate, definen por Destreza. Ante otro empate, definen por");
-		System.out.println("Velocidad. Si resulta en empate, será empate finalmente.");
-		System.out.println("El orden es:");
-		listarCaracteristicas();
-		System.out.println("Pueden enfrentarse personajes contra personajes, personajes contra ligas, o ligas contra ligas.");
-		System.out.println("Cuando se trata de una liga, el valor de cada característica se determina como el promedio de los ");
-		System.out.println("valores de esa característica entre todos los personajes que componen la liga.");
+	private void mostrarReglas() {
+		
+		menu.mostrarReglas();
 
 	}
     
@@ -769,34 +498,22 @@ public class Juego {
 	// ========== INICIO MENU REPORTES ==========
 
     private void menuReportes() throws Exception {
-        boolean seguir = true;
+    	
+    	int seleccion = menu.mostrarMenuConTituloOpcionesSeleccion("menuReportes");
 
-        while (seguir) {
-            System.out.println("");
-            System.out.println("===== Reportes =====");
-            System.out.println("1. Personajes o ligas que vencen a un personaje dado");
-            System.out.println("2. Listado ordenado de personajes por características");
-            System.out.println("3. Regresar al Menú Principal");
-            System.out.print("Seleccione una opción: ");
-
-            int seleccion = scanner.nextInt();
-
-            switch (seleccion) {
-                case 1:
-                	menuObtenerVencedoresContra();
-                    break;
-                case 2:
-                    List<Caracteristica> criterios = seleccionarCriteriosOrdenamiento();
-                    boolean ascendente = seleccionarAscendente();
-                    listadoOrdenadoPorCaracteristica(criterios, ascendente);
-                    break;
-                case 3:
-                    seguir = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
-            }
-        }
+    	switch (seleccion) {
+	        case 1:
+	        	menuObtenerVencedoresContra();
+	            break;
+	        case 2:
+	            List<Caracteristica> criterios = seleccionarCriteriosOrdenamiento();
+	            boolean ascendente = seleccionarAscendente();
+	            listadoOrdenadoPorCaracteristica(criterios, ascendente);
+	            break;
+	        case 3:
+	            menuPrincipal();
+	            break;
+	    }
     }
     
     /**
@@ -810,12 +527,16 @@ public class Juego {
 		List<Caracteristica> caracteristicas;
 		Personaje personajeAEvaluar;
 		
-    	personajeAEvaluar = menuSeleccionarPersonaje();
-    	if (personajeAEvaluar == null) {
-    		menuReportes();
-    		return;
-    	}
+		menu.mostrarTitulo("obtenerVencedoresContra");
+		
+		if (personajes.isEmpty()) {
+			menu.throwException("listaPersonajesVacia");
+		}
+		int seleccionPersonaje = menu.seleccionarCompetidores(personajes);
+		
+    	personajeAEvaluar = personajes.get(seleccionPersonaje - 1);
     	
+    	menu.mostrarTitulo("seleccionarCaracteristica");
     	caracteristicas = menuSeleccionarCaracteristica(null);
     	if (caracteristicas.isEmpty()) {
     		menuReportes();
@@ -825,36 +546,12 @@ public class Juego {
     		caracteristicaEvaluativa = caracteristicas.get(0);
     	}
 		
-		System.out.println("Vencedores:");
-		System.out.println(obtenerVencedoresContra(personajeAEvaluar, caracteristicaEvaluativa));
-    }
-	
-    private Personaje menuSeleccionarPersonaje() throws Exception {
-    	Personaje personajeAEvaluar = null;
-    	String entradaUsuario;
-    	
-    	System.out.println("Seleccione un personaje de la siguiente lista o ingrese 0 para salir:");
-		listarPersonajes();
-		while (personajeAEvaluar == null) {
-			entradaUsuario = scanner.nextLine();
-			if (entradaUsuario.equals("0")) return null;
-			
-			personajeAEvaluar = obtenerPersonajePorNombreFantasia(entradaUsuario);			
-			if (personajeAEvaluar == null) {
-				System.out.println("El personaje ingresado no existe.");
-			}
+		menu.mostrarFinal("obtenerVencedoresContra");
+		List<Competidor> venc = obtenerVencedoresContra(personajeAEvaluar, caracteristicaEvaluativa);
+		if (venc.isEmpty()) {
+			menu.throwException("listaVencedoresVacia");
 		}
-		return personajeAEvaluar;
-    }
-    
-    private Personaje obtenerPersonajePorNombreFantasia(String nombre) {
-    	if (personajes == null) return null;
-    	for (Personaje personaje : personajes) {
-    		if (personaje.getNombreFantasia() == nombre) {
-    			return personaje;
-    		}
-    	}
-    	return null;
+		menu.listarCompetidores(venc);
     }
     
 	private List<Competidor> obtenerVencedoresContra(Competidor retador, Caracteristica caracteristica) throws Exception {
@@ -864,85 +561,63 @@ public class Juego {
 		contrincantes.addAll(ligas);
 		contrincantes.addAll(personajes);
 
-		// VER -> Ver esta logiva de contrincante.esGanador. antes retornaba un boolean, ahora un int. Creo que si es negativo es que no es ganador, pero no se como se implemento.
-		// Agrego la condicion de que sea > 0 para considerarlo ganador, por ahi hay que modificar esta logica, lo agrego para que compile.
 		for (Competidor contrincante : contrincantes) {
-			if (contrincante.esGanador(retador, caracteristica) > 0) {
-				vencedores.add(contrincante);
+			try {
+				if (contrincante.esGanador(retador, caracteristica) > 0) {
+					vencedores.add(contrincante);
+				}
+			} catch (Exception e) {
+				// si recibimos excepcion por mismo tipo, no consideramos al personaje como vencedor del otro y no hacemos nada
 			}
+			
 		}
 		return vencedores;
 	}
 	
 	private List<Caracteristica> seleccionarCriteriosOrdenamiento() {
-		//Se puede utilizar la clase ordenamiento? Vale la pena hacer una clase especifica para la lista de criterios?
+		
 		List<Caracteristica> criterios = new LinkedList<Caracteristica>();
 		
-		criterios = menuSeleccionarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		menu.mostrarTitulo("seleccionarCriterios");
+		
+		criterios = menuSeleccionarCaracteristica(criterios);
 		if (criterios.isEmpty()) {
 			return criterios;
 		}
-		criterios = menuAgregarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		criterios = menuAgregarCaracteristica(criterios);
 		return criterios;
 	}
 	
 	private List<Caracteristica> menuSeleccionarCaracteristica(List<Caracteristica> criterios) {
     	Caracteristica caracteristicaEvaluativa = null;
-    	int entradaUsuario;
     	
     	if (criterios == null) {
     		criterios = new LinkedList<Caracteristica>();
     	}
+    	caracteristicaEvaluativa = seleccionarCaracteristica();
     	
-    	System.out.println("Seleccione una caracteristica o ingrese 0 para salir:");
-		listarCaracteristicas();
-		while (caracteristicaEvaluativa == null) {
-			entradaUsuario = scanner.nextInt();
-			if (entradaUsuario == 0) return criterios;
-			
-			//Ver si se puede quitar el hardcode utilizando el mismo EnumMap (o hacer otro?)
-			switch (entradaUsuario) {
-				case 1:
-					caracteristicaEvaluativa = Caracteristica.VELOCIDAD;
-					break;
-				case 2:
-					caracteristicaEvaluativa = Caracteristica.FUERZA;
-					break;
-				case 3:
-					caracteristicaEvaluativa = Caracteristica.RESISTENCIA;
-					break;
-				case 4:
-					caracteristicaEvaluativa = Caracteristica.DESTREZA;
-					break;
-				default: System.out.println("La caracteristica seleccionada no existe.");
-			}
-			if (criterios.indexOf(caracteristicaEvaluativa) >= 0) {
-				System.out.println("La característica seleccionada ya fue seleccionada previamente. No pueden repetirse.");
-				caracteristicaEvaluativa = null;
-			}
-			else {
-				criterios.add(caracteristicaEvaluativa);
-			}
+		if (criterios.indexOf(caracteristicaEvaluativa) >= 0) {
+			menu.mostrarError("seleccionarCaracteristica2");
+			caracteristicaEvaluativa = null;
+		}
+		else {
+			criterios.add(caracteristicaEvaluativa);
 		}
 		return criterios;
     }
     
 	private List<Caracteristica> menuAgregarCaracteristica (List<Caracteristica> criterios) {
-		final String mensaje = "Ingrese 1 para agregar una nueva característica o 0 para salir:";
 		boolean agregarCaracteristica = true;
-		int entradaUsuario;
 		
 		while(agregarCaracteristica) {
-			System.out.println(mensaje);
-			entradaUsuario = scanner.nextInt();
-			switch (entradaUsuario) {
-				case 0: {
-					agregarCaracteristica = false;
-					return criterios;
-				}
-				case 1: criterios = menuSeleccionarCaracteristica(criterios);
+			int seleccion = menu.mostrarMenuConInstruccionOpciones("agregarCaracteristica");
+			switch (seleccion) {
+				case 1: 
+					criterios = menuSeleccionarCaracteristica(criterios);
 					break;
-				default: System.out.println(mensaje);
+				case 2:
+					agregarCaracteristica = false;
+					break;
 			}
 		}
 		
@@ -950,19 +625,14 @@ public class Juego {
 	}
 	
 	private boolean seleccionarAscendente() {
-		while(true) {
-			System.out.println("Ingrese 1 para mostrar en orden ascendente, 0 para orden descendente:");
-			switch (scanner.nextInt()) {
-				case 0: return false;
-				case 1: return true;
-				default: System.out.println("El valor ingresado no es válido. Intente nuevamente.");
-			}
-		}
+		int seleccion = menu.mostrarMenuConInstruccionOpciones("seleccionarAscendente");
+		return (seleccion == 1) ? true : false;
 	}
 	
-	public void listadoOrdenadoPorCaracteristica(List<Caracteristica> criterios, boolean ascendente) {
+	private void listadoOrdenadoPorCaracteristica(List<Caracteristica> criterios, boolean ascendente) throws Exception{
+		
 		if (criterios == null || criterios.isEmpty()) {
-			System.out.println("No se estableció un orden específico de características. Se utilizará el orden por defecto.");
+			menu.mostrarError("listadoOrdenado");
 			criterios = new LinkedList<Caracteristica>();
 			criterios.addAll(new Ordenamiento().ordenCaracteristicas);
 		}
@@ -971,14 +641,14 @@ public class Juego {
 		orden.setearOrdenCaracteristicas(criterios);
 		
 		if (personajes == null || personajes.isEmpty()) {
-			return;
+			menu.throwException("listaPersonajesVacia");
 		}
 		personajesOrdenados.addAll(personajes);
 		Collections.sort(personajesOrdenados, orden);
-		if (ascendente) { //probar si es así o al revés
+		if (ascendente) {
 			Collections.reverse(personajesOrdenados);
 		}
-		System.out.println(personajesOrdenados);
+		menu.listarCompetidores(personajesOrdenados);
 	}
 	
 	// ========== FIN MENU REPORTES ==========

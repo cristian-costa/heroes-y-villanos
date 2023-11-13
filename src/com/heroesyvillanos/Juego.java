@@ -332,7 +332,7 @@ public class Juego {
 					try {
 						guardarLigasEnArchivo(this.ligas,"archivos/ligas.in");
 					} catch (IOException e) {
-						System.err.println(e.getMessage())
+						System.err.println(e.getMessage());
 						e.printStackTrace();
 					}
                     break;

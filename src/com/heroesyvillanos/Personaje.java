@@ -7,7 +7,7 @@ public class Personaje extends Competidor {
 	private String nombreFantasia;
 	private Map<Caracteristica, Integer> caracteristicas;
 	
-	Personaje(String nombre, String nombreFantasia, Map<Caracteristica, Integer> caracteristicas, TipoCompetidor tipo) throws IllegalArgumentException{
+	public Personaje(String nombre, String nombreFantasia, Map<Caracteristica, Integer> caracteristicas, TipoCompetidor tipo) throws IllegalArgumentException{
 		if(!esNombreValido(nombre)) {
 			throw new IllegalArgumentException("Nombre invalido");
 		}
@@ -52,18 +52,18 @@ public class Personaje extends Competidor {
 	}
 	
 	@Override
-	protected int getSumaCaracteristica(Caracteristica c) {
+	public int getSumaCaracteristica(Caracteristica c) {
 		return caracteristicas.get(c);
 	}
 	
 	@Override
-	protected int getCantidadCompetidores() {
+	public int getCantidadCompetidores() {
 		return 1;
 	}
 	
 	@Override
 	public String toString() {
-		return nombre + ", " + nombreFantasia;
+		return "\"" + nombre + ", " + nombreFantasia + "\"";
 	}
 
 	public Map<Caracteristica, Integer> getCaracteristicas() {

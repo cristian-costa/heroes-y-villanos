@@ -58,56 +58,56 @@ public class Juego {
     
  // ========== INICIO MENU PERSONAJES ==========
     
-    private void menuPersonajes() {
-        boolean seguir = true;
+  private void menuPersonajes() {
+      boolean seguir = true;
 
-        while (seguir) {
-            System.out.println("");
-            System.out.println("===== Administración de Personajes =====");
-            System.out.println("1. Carga desde archivo");
-            System.out.println("2. Creación");
-            System.out.println("3. Listado");
-            System.out.println("4. Guardar en archivo todos los personajes");
-            System.out.println("5. Regresar al Menú Principal");
-            System.out.print("Seleccione una opción: ");
+      while (seguir) {
+          System.out.println("");
+          System.out.println("===== Administración de Personajes =====");
+          System.out.println("1. Carga desde archivo");
+          System.out.println("2. Creación");
+          System.out.println("3. Listado");
+          System.out.println("4. Guardar en archivo todos los personajes");
+          System.out.println("5. Regresar al Menú Principal");
+          System.out.print("Seleccione una opción: ");
 
-            int seleccion = scanner.nextInt();
+          int seleccion = scanner.nextInt();
 
-            switch (seleccion) {
-                case 1:
-                	try {
-                		this.personajes = cargarPersonajesDesdeArchivo("archivos/personajes.in");
-                	} catch (FileNotFoundException e) {
-                		System.err.println(e.getMessage()); // manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
-					} catch (IOException e) {
-						System.err.println(e.getMessage()); // Este por si falla la lectura del archvo  
-					}
-                    break;
-                case 2:
-                    crearPersonaje();
-                    break;
-                case 3:
- 					try {
- 						listarPersonajes();
- 					} catch (Exception e) {
- 						System.out.println(e.getMessage());
- 					}
- 					break;
-                case 4:
-					try {
-						guardarPersonajesEnArchivo(this.personajes, "archivos/personajes.in");
-					} catch (IOException e) {
-						System.err.println(e.getMessage());
-					}
-                    break;
-                case 5:
-                    seguir = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
-            }
+          switch (seleccion) {
+            case 1:
+              try {
+                this.personajes = cargarPersonajesDesdeArchivo("archivos/personajes.in");
+              } catch (FileNotFoundException e) {
+                System.err.println(e.getMessage()); // manejor del error. yo devuelvo una excepcion, este por si no esta el archivo 
+        } catch (IOException e) {
+          System.err.println(e.getMessage()); // Este por si falla la lectura del archvo  
         }
-    }
+                break;
+            case 2:
+                crearPersonaje();
+                break;
+            case 3:
+          try {
+            listarPersonajes();
+          } catch (Exception e) {
+            System.out.println(e.getMessage());
+          }
+          break;
+            case 4:
+        try {
+          guardarPersonajesEnArchivo(this.personajes, "archivos/personajes.in");
+        } catch (IOException e) {
+          System.err.println(e.getMessage());
+        }
+                break;
+            case 5:
+                seguir = false;
+                break;
+            default:
+                System.out.println("Opción no válida. Intente de nuevo.");
+          }
+      }
+  }
         
 	public ArrayList<Personaje> cargarPersonajesDesdeArchivo(String path) throws IOException {
 		// Inicializo array de personajes
@@ -154,7 +154,6 @@ public class Juego {
 	
 	public void guardarPersonajesEnArchivo(List<Personaje> lista, String path) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
-			
 			writer.write("Héroe/Villano, NombreReal, NombrePersonaje, Velocidad, Fuerza, Resistencia, Destreza");
 			writer.newLine();
 			for (Personaje personaje : lista) {
@@ -162,7 +161,7 @@ public class Juego {
 				writer.newLine();
 			}
 			System.out.println("Personajes guardados correctament");	 
-        }catch (IOException e) {
+        } catch (IOException e) {
         	throw new IOException("Error al leer o escribir el archivo");
         }
 	}
@@ -184,11 +183,11 @@ public class Juego {
 			
 			while (seguir) {
 				seguir = false;
-				nombreFantasia = scanner.nextLine();
+				nombreFantasia = scanner.nextLine().strip();
 
 				if (!personajes.isEmpty()) {
 					for (Personaje personaje : personajes) {
-						if (personaje.getNombreFantasia().equals(nombreFantasia)) {
+						if (personaje.getNombreFantasia().equalsIgnoreCase(nombreFantasia)) {
 							System.out.println("Personaje ya existente, ingrese nuevamente: ");
 							seguir = true;
 							break;
@@ -205,7 +204,7 @@ public class Juego {
 			// seguir = true;
 			// while (seguir = true) {
 				// seguir = false;
-				nombreReal = scanner.nextLine();
+				nombreReal = scanner.nextLine().strip();
 			// }
 
 			System.out.println("");
@@ -303,21 +302,20 @@ public class Juego {
             System.out.println("2. Creación");
             System.out.println("3. Listado");
             System.out.println("4. Guardar en archivo todas las ligas");
-            System.out.println("5. Agregar Personajes a Liga");
-            System.out.println("6. Agregar Liga a Liga");
-            System.out.println("7. Regresar al Menú Principal");
+            System.out.println("5. Agregar Competidores a Liga");
+            System.out.println("6. Regresar al Menú Principal");
             System.out.print("Seleccione una opción: ");
 
             int seleccion = scanner.nextInt();
 
             switch (seleccion) {
-                case 1:          	
+                case 1:
                 	try {
                 		this.ligas = cargarLigasDesdeArchivo(this.personajes, "archivos/ligas.in");
             		}catch (FileNotFoundException e) {
-            			System.err.println(e.getMessage());
+            			  System.err.println(e.getMessage());
             		}catch (IOException e) {
-            			System.err.println(e.getMessage());
+            			  System.err.println(e.getMessage()); 
             		}
                 	break;
                 case 2:
@@ -334,18 +332,15 @@ public class Juego {
 					try {
 						guardarLigasEnArchivo(this.ligas,"archivos/ligas.in");
 					} catch (IOException e) {
-						System.err.println(e.getMessage());
+						System.err.println(e.getMessage())
+						e.printStackTrace();
 					}
                     break;
                 case 5:
-                	scanner.nextLine();
-                	agregaCompetidorALiga(1); // Agrega personaje
+                	scanner.nextLine();          
+                	ingresaNombreLigaAgregaCompetidor(); 
                     break;
                 case 6:
-                	scanner.nextLine();
-                	agregaCompetidorALiga(2); // Agrega Liga
-                    break;
-                case 7:
                     seguir = false;
                     break;
                 default:
@@ -421,19 +416,19 @@ public class Juego {
 	
 	private boolean existeLigaEnMemoria(String s) {
 		for(int i=0;i<ligas.size();i++)	{
-			if(ligas.get(i).getNombreLiga().contains(s))
+			if(ligas.get(i).getNombreLiga().equalsIgnoreCase(s))
 				return true;
 		}
 		return false;
 	}
 	
-	public void crearLiga() {
+	public void crearLiga() throws Exception{
 		System.out.println("");
 		System.out.println("Creando liga...");
 		String nombreLiga;
 		boolean valido, seguir;
 		TipoCompetidor tipoLiga;
-		int indexLiga, opcion;
+		int indexLiga;
 		scanner.nextLine();
 
 		do {
@@ -466,10 +461,38 @@ public class Juego {
 		indexLiga = ligas.size() - 1;
 
 		// AGREGO PERSONAJE O LIGA
+		seleccionaCompetidorAAgregar(indexLiga);
+	}
+	
+	private void ingresaNombreLigaAgregaCompetidor() throws Exception{
+		// INGRESO NOMBRE de LIGA a agregar competidores
+		boolean seguir=true;
+		int indiceLigaAgregar;
+		
+		this.listarLigas();
+
+		System.out.println("Ingrese el numero de liga al que desea agregar competidores: ");
+		indiceLigaAgregar = scanner.nextInt();
 
 		do {
+			if (indiceLigaAgregar > 0 && indiceLigaAgregar <= ligas.size()) 
+				seguir=false;
+			else {
+				System.out.println("Opcion incorrecta, ingrese una valida: ");
+				indiceLigaAgregar = scanner.nextInt();
+				seguir=true;
+			}
+		}while(seguir);
+		
+			seleccionaCompetidorAAgregar(indiceLigaAgregar-1);
+	}
+	
+	private void seleccionaCompetidorAAgregar(int indexLiga)  throws Exception{
+		int opcion;
+		boolean seguir;
+		do {
 			seguir = false;
-			System.out.println("AGREGAR COMPETIDORES A LA LIGA...... '" + nombreLiga + "'....... ");
+			System.out.println("AGREGAR COMPETIDORES A LA LIGA...... '" + ligas.get(indexLiga).getNombre() + "'....... ");
 			System.out.println(" 1. Agregar un Personaje");
 			System.out.println(" 2. Agregar una Liga");
 			System.out.println(" 3. Volver al menu de Ligas: ");
@@ -506,80 +529,64 @@ public class Juego {
 		} while (seguir);
 	}
 	
-	private void agregaCompetidorALiga(int opcion) {
-		String nombreLiga;
-		int i;
+	private void agregaPersonajeALiga(int indexLiga) throws Exception {
+		boolean seguir=true;
+		int indicePersonaje;
 		
-		// INGRESO NOMBRE de LIGA
-		System.out.print("Ingrese nombre de la Liga para agregar Competidores: ");
-		nombreLiga = scanner.nextLine();
-
-		if (!validaCadena(nombreLiga) || !existeLigaEnMemoria(nombreLiga)) {
-			System.out.print("El nombre de Liga ingresado no es valido o no existe... ");
-		}
-		else {
-			for(i=0; i < this.ligas.size(); i++) {
-				if(ligas.get(i).getNombreLiga().equalsIgnoreCase(nombreLiga))
-					break;
+		this.listarPersonajes();
+		System.out.println("Ingrese el numero de personaje que desea agregar: ");
+		indicePersonaje = scanner.nextInt();
+		
+		do {
+			if(indicePersonaje > 0 && indicePersonaje <= personajes.size() ) {
+					try {
+						ligas.get(indexLiga).agregarCompetidorALiga(personajes.get(indicePersonaje-1));
+						System.out.println("Personaje CARGADO CORRECTAMENTE A LA LIGA");
+					} catch (Exception E) {
+						System.out.println(E.getMessage());
+					}
+					seguir=false;
 			}
-			
-			if(opcion==1)
-				agregaPersonajeALiga(i);
-			else
-				agregaLigaALiga(i);
-		}
+			else {
+				System.out.println("Opcion incorrecta, ingrese una valida: ");
+				indicePersonaje = scanner.nextInt();
+				seguir=true;
+			}
+		}while(seguir);
 	}
 	
-	private void agregaPersonajeALiga(int indexLiga) {
-		String nombreFantasia;
-		boolean seguir;
-		int aux = 0;
-		System.out.println("Ingrese nombre de Personaje: ");
-		nombreFantasia = scanner.nextLine();
-		seguir = true;
-		
-		while (seguir && aux < personajes.size()) {
-			if (personajes.get(aux).getNombreFantasia().equalsIgnoreCase(nombreFantasia)) {
-				try {
-					ligas.get(indexLiga).agregarCompetidorALiga(personajes.get(aux));
-					System.out.println("Personaje CARGADO CORRECTAMENTE A LA LIGA");
-				} catch (Exception E) {
-					System.out.println(E.getMessage());
+	private void agregaLigaALiga(int indexLiga) throws Exception {
+		boolean seguir=true;
+		int indiceLigaAgregar;
+    
+		this.listarLigas();
+		System.out.println("Ingrese el numero de liga que desea agregar: ");
+		indiceLigaAgregar = scanner.nextInt();
+
+		do {
+			if (indiceLigaAgregar > 0 && indiceLigaAgregar <= ligas.size()) {
+				seguir=false;
+				if (!ligas.get(indiceLigaAgregar-1).getCompetidores().contains(ligas.get(indexLiga))) { // evita que la liga
+																										// entre en una liga
+																										// que forma parte de
+																										// ella
+					try {
+						ligas.get(indexLiga).agregarCompetidorALiga(ligas.get(indiceLigaAgregar-1));
+						System.out.println("Liga CARGADA CORRECTAMENTE");
+					} catch (Exception E) {
+						System.out.println(E.getMessage());
+					}
+					
 				}
-				seguir = false;
+				else
+					System.out.println("Liga no valida.");
 			}
-			else
-				aux++;
-		}
-		
-		if(seguir)
-			System.out.println("No se encuentra el personaje...");
-	}
-	
-	private void agregaLigaALiga(int indexLiga) {
-		String nombreLiga;
-		boolean seguir;
-		int aux = 0;
-
-		System.out.println("Ingrese nombre de Liga: ");
-		nombreLiga = scanner.nextLine();
-		seguir = true;
-
-		while (seguir & aux < ligas.size()) {
-			if (ligas.get(aux).getNombreLiga().equalsIgnoreCase(nombreLiga)) {
-				try {
-					ligas.get(indexLiga).agregarCompetidorALiga(ligas.get(aux));
-					System.out.println("Liga CARGADA CORRECTAMENTE");
-
-				} catch (Exception E) {
-					System.out.println(E.getMessage());
-				}
-				seguir = false;
-			} else
-				aux++;
-		}
-		if (seguir)
-			System.out.println("No se encuentra la Liga... ");
+			else {
+				System.out.println("Opcion incorrecta, ingrese una valida: ");
+				indiceLigaAgregar = scanner.nextInt();
+				seguir=true;
+			}
+		}while(seguir);
 	}
 	
 	public void listarLigas() throws Exception{
@@ -609,8 +616,15 @@ public class Juego {
             System.out.println("2. Ver reglas de combate");
             System.out.println("3. Regresar al Menú Principal");
             System.out.print("Seleccione una opción: ");
-
-            int seleccion = scanner.nextInt();
+            int seleccion = 0;
+            
+            try {
+				 seleccion = scanner.nextInt();
+			} catch (Exception e) {
+				scanner.nextLine();
+				seguir = true;
+			}
+            
 
             switch (seleccion) {
                 case 1:
@@ -638,8 +652,10 @@ public class Juego {
         	Competidor comp2 = seleccionarCompetidor();
         	Caracteristica car = seleccionarCaracteristica();
         	combatir(comp1, comp2, car);
+		} catch (NullPointerException e) {
+			System.out.println("No se puede combatir con una liga vacía");
+			System.out.println("Regresando al menú de combates");
 		} catch (Exception e) {
-			// TODO: handle exception
 			System.out.println(e.getMessage());
 			System.out.println("Regresando al menú de combates");
 		}
@@ -772,6 +788,7 @@ public class Juego {
             System.out.print("Seleccione una opción: ");
 
             int seleccion = scanner.nextInt();
+            scanner.nextLine(); //consumir enter
 
             switch (seleccion) {
                 case 1:
@@ -825,7 +842,7 @@ public class Juego {
     	Personaje personajeAEvaluar = null;
     	String entradaUsuario;
     	
-    	System.out.println("Seleccione un personaje de la siguiente lista o ingrese 0 para salir:");
+    	System.out.println("Seleccione un personaje de la siguiente lista según su nombre de fantasía o ingrese 0 para salir:");
 		listarPersonajes();
 		while (personajeAEvaluar == null) {
 			entradaUsuario = scanner.nextLine();
@@ -842,7 +859,7 @@ public class Juego {
     private Personaje obtenerPersonajePorNombreFantasia(String nombre) {
     	if (personajes == null) return null;
     	for (Personaje personaje : personajes) {
-    		if (personaje.getNombreFantasia() == nombre) {
+    		if (personaje.getNombreFantasia().strip().equals(nombre)) {
     			return personaje;
     		}
     	}
@@ -853,12 +870,18 @@ public class Juego {
 		List<Competidor> contrincantes = new ArrayList<Competidor>();
 		List<Competidor> vencedores = new ArrayList<Competidor>();
 		
-		contrincantes.addAll(ligas);
+		TipoCompetidor tipoRetador = retador.getTipoCompetidor();
+		
+		contrincantes.addAll(ligas);		
 		contrincantes.addAll(personajes);
+		contrincantes.removeIf(c -> (tipoRetador == c.getTipoCompetidor()));
 
 		// VER -> Ver esta logiva de contrincante.esGanador. antes retornaba un boolean, ahora un int. Creo que si es negativo es que no es ganador, pero no se como se implemento.
 		// Agrego la condicion de que sea > 0 para considerarlo ganador, por ahi hay que modificar esta logica, lo agrego para que compile.
 		for (Competidor contrincante : contrincantes) {
+			if (contrincante.getTipoCompetidor() == retador.getTipoCompetidor()) {
+				break;
+			}
 			if (contrincante.esGanador(retador, caracteristica) > 0) {
 				vencedores.add(contrincante);
 			}
@@ -956,7 +979,7 @@ public class Juego {
 		if (criterios == null || criterios.isEmpty()) {
 			System.out.println("No se estableció un orden específico de características. Se utilizará el orden por defecto.");
 			criterios = new LinkedList<Caracteristica>();
-			criterios.addAll(new Ordenamiento().ordenCaracteristicas);
+			criterios.addAll(new Ordenamiento().getOrdenCaracteristicas());
 		}
 		List<Competidor> personajesOrdenados = new ArrayList<Competidor>();
 		Ordenamiento orden = new Ordenamiento();
@@ -967,7 +990,7 @@ public class Juego {
 		}
 		personajesOrdenados.addAll(personajes);
 		Collections.sort(personajesOrdenados, orden);
-		if (ascendente) { //probar si es así o al revés
+		if (!ascendente) {
 			Collections.reverse(personajesOrdenados);
 		}
 		System.out.println(personajesOrdenados);

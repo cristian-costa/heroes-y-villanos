@@ -11,7 +11,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	private Map<Caracteristica, Integer> cache_promedio_caracteristicas;
 	
 	// Constructor
-	Liga(String nombre, TipoCompetidor tipo) throws Exception{
+	public Liga(String nombre, TipoCompetidor tipo) throws Exception{
 		if(!esNombreValido(nombre)) {
 			throw new Exception("Nombre invalido");
 		}
@@ -21,10 +21,12 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 		this.nombreLiga = nombre;
 		this.competidores = new ArrayList<Competidor>();
 		this.cache_promedio_caracteristicas = new HashMap<Caracteristica, Integer>();
+		for (Caracteristica c : Caracteristica.values())    //caracteristicas en 0 
+			cache_promedio_caracteristicas.put(c, 0);
 	}
 	
 	// Constructor
-	Liga(String nombre, List<Competidor> competidores, TipoCompetidor tipo) throws Exception{
+	public Liga(String nombre, List<Competidor> competidores, TipoCompetidor tipo) throws Exception{
 		if(!esNombreValido(nombre)) {
 			throw new Exception("Nombre invalido");
 		}
@@ -47,11 +49,13 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 		return this.nombreLiga;
 	}
 	
-	protected void agregarCompetidorALiga(Competidor c) throws Exception {
+	public void agregarCompetidorALiga(Competidor c) throws Exception {
 		if(!tipoCompetidor.equals(c.tipoCompetidor)) {
 			throw new Exception("No se puede agregar un personaje/liga a una liga con distintos tipos de competidor"); 
 		}
-		
+		if(this.equals(c)){  // esta misma liga
+			throw new Exception("Esta es la misma liga a la que esta agregando competidores!"); 
+		}
 		if(!c.puedeEntrarEnLiga()){
 			throw new Exception("Este personaje ya pertenece a una liga");
 		}
@@ -62,31 +66,37 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	}
 	
 	@Override
-	protected int getPromedioCaracteristica(Caracteristica c) {
+	protected int getPromedioCaracteristica(Caracteristica c) throws NullPointerException{
 		return cache_promedio_caracteristicas.get(c);
 	}
 	
 	private void updateCacheCaracteristicas() {
 		int cantComp = this.getCantidadCompetidores();
-		for (Caracteristica c : Caracteristica.values()) {
-			int value = this.getSumaCaracteristica(c) / cantComp;
-			cache_promedio_caracteristicas.put(c, value);
+		if(cantComp!=0) {											//si la cantidad de competidores no es 0
+			for (Caracteristica c : Caracteristica.values()) {
+				int value = this.getSumaCaracteristica(c) / cantComp;
+				cache_promedio_caracteristicas.put(c, value);
+			}
 		}
 	}
 	
 	@Override
-	protected int getCantidadCompetidores() {
+	public int getCantidadCompetidores() {
 		int sum = 0;
-		for(Competidor comp : competidores) {
-			sum += comp.getCantidadCompetidores();
+		if(!this.competidores.isEmpty())  {      //si no hay competidores cargados devuelve 0
+			for(Competidor comp : competidores) {
+				sum += comp.getCantidadCompetidores();
+			}
 		}
 		return sum;
 	}
 	
-	protected int getSumaCaracteristica(Caracteristica c) {
+	public int getSumaCaracteristica(Caracteristica c) {
 		int sum = 0;
-		for(Competidor comp : competidores) {
-			sum += comp.getSumaCaracteristica(c);
+		if(!this.competidores.isEmpty())  {				//si no hay competidores cargados devuelve 0
+			for(Competidor comp : competidores) {
+				sum += comp.getSumaCaracteristica(c);
+			}
 		}
 		return sum;
 	}

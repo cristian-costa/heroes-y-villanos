@@ -11,7 +11,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	private Map<Caracteristica, Integer> cache_promedio_caracteristicas;
 	
 	// Constructor
-	Liga(String nombre, TipoCompetidor tipo) throws Exception{
+	public Liga(String nombre, TipoCompetidor tipo) throws Exception{
 		if(!esNombreValido(nombre)) {
 			throw new Exception("Nombre invalido");
 		}
@@ -26,7 +26,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	}
 	
 	// Constructor
-	Liga(String nombre, List<Competidor> competidores, TipoCompetidor tipo) throws Exception{
+	public Liga(String nombre, List<Competidor> competidores, TipoCompetidor tipo) throws Exception{
 		if(!esNombreValido(nombre)) {
 			throw new Exception("Nombre invalido");
 		}
@@ -49,7 +49,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 		return this.nombreLiga;
 	}
 	
-	protected void agregarCompetidorALiga(Competidor c) throws Exception {
+	public void agregarCompetidorALiga(Competidor c) throws Exception {
 		if(!tipoCompetidor.equals(c.tipoCompetidor)) {
 			throw new Exception("No se puede agregar un personaje/liga a una liga con distintos tipos de competidor"); 
 		}
@@ -71,7 +71,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	}
 	
 	@Override
-	protected int getPromedioCaracteristica(Caracteristica c) {
+	protected int getPromedioCaracteristica(Caracteristica c) throws NullPointerException{
 		return cache_promedio_caracteristicas.get(c);
 	}
 	
@@ -86,7 +86,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	}
 	
 	@Override
-	protected int getCantidadCompetidores() {
+	public int getCantidadCompetidores() {
 		int sum = 0;
 		if(!this.competidores.isEmpty())  {      //si no hay competidores cargados devuelve 0
 			for(Competidor comp : competidores) {
@@ -96,7 +96,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 		return sum;
 	}
 	
-	protected int getSumaCaracteristica(Caracteristica c) {
+	public int getSumaCaracteristica(Caracteristica c) {
 		int sum = 0;
 		if(!this.competidores.isEmpty())  {				//si no hay competidores cargados devuelve 0
 			for(Competidor comp : competidores) {
@@ -134,14 +134,19 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	public TipoCompetidor isTipoCompetidor() {
 		return tipoCompetidor;
 	}
+	
+	@Override
+	protected String getNombreParaArchivo() {
+		return nombreLiga;
+	}
 
 	// VER -> metodo getNombre
 	public String toFileLine() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.nombreLiga);
-//		for (Competidor c : competidores) {
-//			sb.append(", " + c.getNombre());
-//		}
+		for (Competidor c : competidores) {
+			sb.append(", " + c.getNombreParaArchivo());
+		}
 		return sb.toString();
 	}
 }

@@ -11,6 +11,7 @@ public abstract class Competidor implements Comparable<Competidor> {
 	abstract protected int getSumaCaracteristica(Caracteristica c);
 	abstract protected int getCantidadCompetidores();
 	abstract public List<Competidor> getCompetidores();
+	abstract protected String getNombreParaArchivo();
 	
 	protected boolean esNombreValido(String name) {
 		if(name.length() == 0) return false;
@@ -34,7 +35,7 @@ public abstract class Competidor implements Comparable<Competidor> {
 		return comp_1.getPromedioCaracteristica(c) - comp_2.getPromedioCaracteristica(c);
 	}
 	
-	public int esGanador(Competidor competidor, Caracteristica c) throws Exception {
+	public int esGanador(Competidor competidor, Caracteristica c) throws Exception, NullPointerException{
 		if(this.tipoCompetidor == competidor.tipoCompetidor) {
 			throw new Exception("No se pueden enfrentar competidores del mismo tipo");
 		}
@@ -59,7 +60,7 @@ public abstract class Competidor implements Comparable<Competidor> {
 	public int compareTo(Competidor c) {
 		int resultado = 0;
 		
-		for (Caracteristica caracteristicaDeComparacion : orden.ordenCaracteristicas) {
+		for (Caracteristica caracteristicaDeComparacion : orden.getOrdenCaracteristicas()) {
 			resultado =
 				this.getPromedioCaracteristica(caracteristicaDeComparacion) -
 				c.getPromedioCaracteristica(caracteristicaDeComparacion);

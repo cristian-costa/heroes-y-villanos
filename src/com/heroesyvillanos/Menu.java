@@ -10,11 +10,9 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 public class Menu {
-
 	private Scanner scanner = new Scanner(System.in);
 	private static final Locale es_AR = new Locale("es", "AR");
 	private static final ResourceBundle bundle = ResourceBundle.getBundle("resources.text", es_AR);
-
 
 	public int mostrarMenuConTituloOpcionesSeleccion(String nombreMenu){
 		ArrayList<String> opciones = new ArrayList<String>();
@@ -86,7 +84,6 @@ public class Menu {
         }
 
         return opcion;
-
 	}
 
 	private void mostrarMenuEnConsola(String titulo, ArrayList<String> opciones, String seleccion) {
@@ -96,7 +93,6 @@ public class Menu {
 			System.out.println(opcion);
 		}
 		System.out.println(seleccion);
-
 	}
 
 	private void mostrarMenuEnConsola(String instruccion, ArrayList<String> opciones) {
@@ -105,18 +101,15 @@ public class Menu {
 		for(String opcion : opciones) {
 			System.out.println(opcion);
 		}
-
 	}
 
 	private void mostrarTextoEnConsola(String s) {
 		System.out.println("");
 		System.out.println(s);
-
 	}
 
 	private void mostrarTextoEnConsolaSinSeparacion(String s) {
 		System.out.println(s);
-
 	}
 
 	private int registrarOpcion(ArrayList<String> opciones){
@@ -130,11 +123,11 @@ public class Menu {
 				}
 			}
 		}
+		
 		return 0;
 	}
 
 	public String registrarPalabra(String nombreMenu, boolean error) {
-
 		String instruccion = bundle.getString(nombreMenu + ".instruccion");
 		if (error) {
 			String err = bundle.getString(nombreMenu + ".error");
@@ -172,7 +165,6 @@ public class Menu {
 
 	public void mostrarTextoExcepcion(Exception e) {
 		mostrarTextoEnConsola(e.getMessage());
-
 	}
 
 	public void mostrarTitulo(String nombreMenu) {
@@ -207,6 +199,7 @@ public class Menu {
 			} while (error);
 
 		}
+		
 		return caracteristicasValores;
 	}
 
@@ -264,20 +257,19 @@ public class Menu {
 				numeroValor = 0;
 			}
 		}
+		
 		return numeroValor;
 	}
 
 	public void mostrarBienvenida() {
 		String titulo = bundle.getString("bienvenida.titulo");
 		mostrarTextoEnConsola(titulo);
-
 	}
 
 	public void listarCompetidores(List<? extends Competidor> competidores) {
 		for (int i = 0; i < competidores.size(); i++) {
 			mostrarTextoEnConsolaSinSeparacion((i+1) + "- " + competidores.get(i));
 		}
-
 	}
 
 	public int seleccionarCompetidores(List<? extends Competidor> competidores) {
@@ -310,7 +302,6 @@ public class Menu {
 	public void mostrarResultado(String nombreMenu, int i, String s2) {
 		String s1 = bundle.getString(nombreMenu + ".resultado" + i);
 		mostrarTextoEnConsola(s1 + s2);
-
 	}
 
 	public void mostrarReglas() {

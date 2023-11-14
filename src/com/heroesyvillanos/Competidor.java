@@ -5,8 +5,7 @@ import java.util.List;
 public abstract class Competidor implements Comparable<Competidor> {
 	protected TipoCompetidor tipoCompetidor;
 	protected boolean estaDentroDeLiga;
-	private static Ordenamiento orden = new Ordenamiento(); //convertir en singleton? Esta bien que cada competidor tenga un orden?
-	
+	private static Ordenamiento orden = new Ordenamiento();
 	abstract protected int getPromedioCaracteristica(Caracteristica c);
 	abstract protected int getSumaCaracteristica(Caracteristica c);
 	abstract protected int getCantidadCompetidores();

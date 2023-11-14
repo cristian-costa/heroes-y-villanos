@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Liga extends Competidor implements Comparable<Competidor> {
 	private String nombreLiga;
-	private List<Competidor> competidores; // puede contener personajes y ligas
+	private List<Competidor> competidores; // Puede contener personajes y ligas
 	private Map<Caracteristica, Integer> cache_promedio_caracteristicas;
 	
 	// Constructor
@@ -77,7 +77,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	
 	private void updateCacheCaracteristicas() {
 		int cantComp = this.getCantidadCompetidores();
-		if(cantComp!=0) {											//si la cantidad de competidores no es 0
+		if(cantComp!=0) {
 			for (Caracteristica c : Caracteristica.values()) {
 				int value = this.getSumaCaracteristica(c) / cantComp;
 				cache_promedio_caracteristicas.put(c, value);
@@ -88,7 +88,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	@Override
 	public int getCantidadCompetidores() {
 		int sum = 0;
-		if(!this.competidores.isEmpty())  {      //si no hay competidores cargados devuelve 0
+		if(!this.competidores.isEmpty())  {
 			for(Competidor comp : competidores) {
 				sum += comp.getCantidadCompetidores();
 			}
@@ -98,7 +98,7 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 	
 	public int getSumaCaracteristica(Caracteristica c) {
 		int sum = 0;
-		if(!this.competidores.isEmpty())  {				//si no hay competidores cargados devuelve 0
+		if(!this.competidores.isEmpty())  {
 			for(Competidor comp : competidores) {
 				sum += comp.getSumaCaracteristica(c);
 			}
@@ -140,7 +140,6 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 		return nombreLiga;
 	}
 
-	// VER -> metodo getNombre
 	public String toFileLine() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.nombreLiga);

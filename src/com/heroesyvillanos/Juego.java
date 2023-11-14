@@ -94,6 +94,7 @@ public class Juego {
           }
     }
     
+    // CASE 1: Cargar personajes desde archivo
     public ArrayList<Personaje> cargarPersonajesDesdeArchivo(String path) throws Exception {
 		menu.mostrarTitulo("cargarPersonajes");
 		
@@ -139,23 +140,8 @@ public class Juego {
 	        
 		return listaPersonaje;
 	}
-    
-	public void guardarPersonajesEnArchivo(List<Personaje> lista, String path) throws Exception {
-		menu.mostrarTitulo("guardarPersonajes");
-		
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
-			writer.write("Héroe/Villano, NombreReal, NombrePersonaje, Velocidad, Fuerza, Resistencia, Destreza");
-			writer.newLine();
-			for (Personaje personaje : lista) {
-				writer.write(personaje.toFileLine());
-				writer.newLine();
-			}
-        } catch (IOException e) {
-        	menu.throwException("io");
-        }
-		menu.mostrarFinal("guardarPersonajes");
-	}
 	
+	// CASE 2: Crear personaje
 	public void crearPersonaje() {
 		boolean error = false;
 		TipoCompetidor tipo;
@@ -202,12 +188,30 @@ public class Juego {
 		menu.mostrarFinal("crearPersonaje");
 	}
 	
+	// CASE 3: Listado de personajes
 	public void listarPersonajes() throws Exception {
 		if (!personajes.isEmpty()) {
 			menu.listarCompetidores(personajes);
 		} else {
 			menu.throwException("listaPersonajesVacia");
 		}		
+	}
+	
+    // CASE 4: Guardar personajes en archivo
+	public void guardarPersonajesEnArchivo(List<Personaje> lista, String path) throws Exception {
+		menu.mostrarTitulo("guardarPersonajes");
+		
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+			writer.write("Héroe/Villano, NombreReal, NombrePersonaje, Velocidad, Fuerza, Resistencia, Destreza");
+			writer.newLine();
+			for (Personaje personaje : lista) {
+				writer.write(personaje.toFileLine());
+				writer.newLine();
+			}
+        } catch (IOException e) {
+        	menu.throwException("io");
+        }
+		menu.mostrarFinal("guardarPersonajes");
 	}
 	
 	// ========== FIN MENU PERSONAJES - INICIO MENU LIGAS ==========
@@ -253,6 +257,7 @@ public class Juego {
         }
     }
   
+	// CASE 1: Cargar ligas desde archivo
   	public ArrayList<Liga> cargarLigasDesdeArchivo(List<Personaje>listPersonaje, String path) throws Exception {
 		menu.mostrarTitulo("cargarLigas");
 		ArrayList<Liga> listaLiga = new ArrayList<Liga>();
@@ -295,35 +300,8 @@ public class Juego {
         menu.mostrarFinal("cargarLigas");
 		return listaLiga;
 	}
-  
-	public void guardarLigasEnArchivo(List<Liga> lista, String path) throws Exception {
-		menu.mostrarTitulo("guardarLigas");
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
-			for (Liga liga : lista) {
-				writer.write(liga.toFileLine());
-				writer.newLine();
-			}			
-        } catch (IOException e) {
-        	menu.throwException("io");
-        }
 		
-		menu.mostrarFinal("guardarLigas");
-	}
-	
-	private boolean validaCadena(String s) {
-		if (s.isBlank() || s.isEmpty())
-			return false;
-		return true;
-	}
-	
-	private boolean existeLigaEnMemoria(String s) {
-		for(int i=0;i<ligas.size();i++)	{
-			if(ligas.get(i).getNombreLiga().equalsIgnoreCase(s))
-				return true;
-		}
-		return false;
-	}
-		
+	// CASE 2: Crear liga
 	public void crearLiga() throws Exception{
 		String nombreLiga;
 		TipoCompetidor tipoLiga;
@@ -370,7 +348,32 @@ public class Juego {
 			System.out.print("La opcion ingresada es incorrecta:");
 		}
 	}
+	
+	// CASE 3: Listado de ligas
+	private void listarLigas() throws Exception{
+		if(!ligas.isEmpty()) {
+			menu.listarCompetidores(ligas);
+		} else {
+			menu.throwException("listaLigasVacia");
+		}
+	}
+	
+  	// CASE 4: Guardar ligas en archivo
+	public void guardarLigasEnArchivo(List<Liga> lista, String path) throws Exception {
+		menu.mostrarTitulo("guardarLigas");
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+			for (Liga liga : lista) {
+				writer.write(liga.toFileLine());
+				writer.newLine();
+			}			
+        } catch (IOException e) {
+        	menu.throwException("io");
+        }
 		
+		menu.mostrarFinal("guardarLigas");
+	}
+	
+	// CASE 5: Agregar competidor a liga	
 	private void ingresaNombreLigaAgregaCompetidor() throws Exception{
 		// INGRESO NOMBRE de LIGA a agregar competidores
 		boolean seguir=true;
@@ -466,12 +469,19 @@ public class Juego {
 		menu.mostrarFinal("ligaAgregarLiga");
 	}
 	
-	private void listarLigas() throws Exception{
-		if(!ligas.isEmpty()) {
-			menu.listarCompetidores(ligas);
-		} else {
-			menu.throwException("listaLigasVacia");
+	// AUXILIARES MENU LIGAS
+	private boolean validaCadena(String s) {
+		if (s.isBlank() || s.isEmpty())
+			return false;
+		return true;
+	}
+	
+	private boolean existeLigaEnMemoria(String s) {
+		for(int i=0;i<ligas.size();i++)	{
+			if(ligas.get(i).getNombreLiga().equalsIgnoreCase(s))
+				return true;
 		}
+		return false;
 	}
 	
 	// ========== FIN MENU LIGAS - INICIO MENU COMBATES==========
@@ -492,6 +502,7 @@ public class Juego {
 	    }
     }
 
+	// CASE 1: Realizar combate
     private void menuRealizarCombate() throws Exception{
     	try {
     		menu.mostrarTitulo("realizarCombateComp1");
@@ -560,6 +571,7 @@ public class Juego {
 		}
 	}
 	
+	// CASE 2: Mostrar reglas
 	private void mostrarReglas() {
 		menu.mostrarReglas();
 	}
@@ -584,12 +596,7 @@ public class Juego {
         }
     }
     
-    /**
-	* Toma un competidor y una caracteristica,
-	* obtiene lista de competidores que vencerian a un
-	* competidor basandose en una caracteristica
-     * @throws Exception 
-	*/
+    // CASE 1: Toma un competidor y una caracteristica, obtiene lista de competidores que vencerian a un competidor basandose en una caracteristica
 	private void menuObtenerVencedoresContra() throws Exception {
 		Caracteristica caracteristicaEvaluativa;
 		List<Caracteristica> caracteristicas;
@@ -630,34 +637,6 @@ public class Juego {
 		}
 		menu.listarCompetidores(venc);
     }
-	
-    private Personaje menuSeleccionarPersonaje() throws Exception {
-    	Personaje personajeAEvaluar = null;
-    	String entradaUsuario;
-    	
-    	System.out.println("Seleccione un personaje de la siguiente lista según su nombre de fantasía o ingrese 0 para salir:");
-		listarPersonajes();
-		while (personajeAEvaluar == null) {
-			entradaUsuario = scanner.nextLine();
-			if (entradaUsuario.equals("0")) return null;
-			
-			personajeAEvaluar = obtenerPersonajePorNombreFantasia(entradaUsuario);			
-			if (personajeAEvaluar == null) {
-				System.out.println("El personaje ingresado no existe.");
-			}
-		}
-		return personajeAEvaluar;
-    }
-    
-    private Personaje obtenerPersonajePorNombreFantasia(String nombre) {
-    	if (personajes == null) return null;
-    	for (Personaje personaje : personajes) {
-    		if (personaje.getNombreFantasia().strip().equals(nombre)) {
-    			return personaje;
-    		}
-    	}
-    	return null;
-    }
     
 	private List<Competidor> obtenerVencedoresContra(Competidor retador, Caracteristica caracteristica) throws Exception {
 		List<Competidor> contrincantes = new ArrayList<Competidor>();
@@ -669,8 +648,6 @@ public class Juego {
 		contrincantes.addAll(personajes);
 		contrincantes.removeIf(c -> (tipoRetador == c.getTipoCompetidor()));
 
-		// VER -> Ver esta logiva de contrincante.esGanador. antes retornaba un boolean, ahora un int. Creo que si es negativo es que no es ganador, pero no se como se implemento.
-		// Agrego la condicion de que sea > 0 para considerarlo ganador, por ahi hay que modificar esta logica, lo agrego para que compile.
 		for (Competidor contrincante : contrincantes) {
 			if (contrincante.getTipoCompetidor() == retador.getTipoCompetidor()) {
 				break;
@@ -683,16 +660,15 @@ public class Juego {
 	}
 	
 	private List<Caracteristica> seleccionarCriteriosOrdenamiento() {
-		//Se puede utilizar la clase ordenamiento? Vale la pena hacer una clase especifica para la lista de criterios?
 		List<Caracteristica> criterios = new LinkedList<Caracteristica>();
 		
 		menu.mostrarTitulo("seleccionarCriterios");
 		
-		criterios = menuSeleccionarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		criterios = menuSeleccionarCaracteristica(criterios);
 		if (criterios.isEmpty()) {
 			return criterios;
 		}
-		criterios = menuAgregarCaracteristica(criterios); //si se pasa por referencia, no hace falta el "criterios =" ?
+		criterios = menuAgregarCaracteristica(criterios);
 		return criterios;
 	}
 	

@@ -29,8 +29,7 @@ public class Personaje extends Competidor {
 		estaDentroDeLiga = false;
 	}
 	
-	// Getters y Setters -> nombre
-
+	// Getters y Setters
 	public String getNombre() {
 		return nombre;
 	}

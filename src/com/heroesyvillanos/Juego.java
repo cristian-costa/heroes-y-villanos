@@ -287,6 +287,8 @@ public class Juego {
 		menu.mostrarTitulo("cargarLigas");
 		ArrayList<Liga> listaLiga = new ArrayList<Liga>();
 		
+		boolean algunaLigaNoCreada = false;
+		
         try (
         	BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
@@ -314,7 +316,9 @@ public class Juego {
 				}
             	if(!competidores.isEmpty()) {
             		listaLiga.add(new Liga(ligaString[0], competidores, heovi));
-            	}          
+            	} else {
+            		algunaLigaNoCreada = true;
+            	}
             }	            
         } catch (FileNotFoundException e) {	        	
         	menu.throwException("fileNotFound", path);     	
@@ -322,7 +326,12 @@ public class Juego {
         	menu.throwException("io");
         }
         
-        menu.mostrarFinal("cargarLigas");
+        if (algunaLigaNoCreada) {
+        	menu.mostrarError("cargarLigas");
+		} else {
+			menu.mostrarFinal("cargarLigas");
+		}
+        
 		return listaLiga;
 	}
 		
@@ -432,6 +441,10 @@ public class Juego {
 	private void ingresaNombreLigaAgregaCompetidor() throws Exception{
 		
 		menu.mostrarTitulo("ligaAgregarCompetidor");
+		
+		if (ligas.isEmpty()) {
+			menu.throwException("listaLigasVacia");
+		}
 		
 		int seleccion = menu.seleccionarCompetidores(ligas);
 		

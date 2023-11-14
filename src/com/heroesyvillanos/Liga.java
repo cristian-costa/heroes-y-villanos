@@ -59,6 +59,11 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 		if(!c.puedeEntrarEnLiga()){
 			throw new Exception("Este personaje ya pertenece a una liga");
 		}
+		for(Competidor comp : c.getCompetidores()) {
+			if(comp.equals(this)) {
+				throw new Exception("La liga que quieres agregar ya incluye a esta liga");
+			}
+		}
 		
 		competidores.add(c);
 		c.setEstaDentroDeLiga(true);
@@ -101,8 +106,15 @@ public class Liga extends Competidor implements Comparable<Competidor> {
 		return sum;
 	}
 	
-	public List<Competidor> getCompetidores() {
-		return competidores;
+	public List<Competidor> getCompetidores() {		
+		List<Competidor> aux_competidores = new ArrayList<Competidor>();
+		for(Competidor comp : competidores) {
+			if(comp instanceof Liga) {
+				aux_competidores.add(comp);				
+			}
+			aux_competidores.addAll(comp.getCompetidores());	
+		}
+		return aux_competidores;
 	}
 	
 	@Override

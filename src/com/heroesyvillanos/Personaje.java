@@ -1,5 +1,7 @@
 package com.heroesyvillanos;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Personaje extends Competidor {
@@ -60,6 +62,13 @@ public class Personaje extends Competidor {
 	public int getCantidadCompetidores() {
 		return 1;
 	}
+	
+	@Override
+	public List<Competidor> getCompetidores() {
+		List<Competidor> competidores = new ArrayList<Competidor>();
+		competidores.add(this);
+		return competidores; 
+	}	
 	
 	@Override
 	public String toString() {

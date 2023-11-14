@@ -1,5 +1,7 @@
 package com.heroesyvillanos;
 
+import java.util.List;
+
 public abstract class Competidor implements Comparable<Competidor> {
 	protected TipoCompetidor tipoCompetidor;
 	protected boolean estaDentroDeLiga;
@@ -8,6 +10,7 @@ public abstract class Competidor implements Comparable<Competidor> {
 	abstract protected int getPromedioCaracteristica(Caracteristica c);
 	abstract protected int getSumaCaracteristica(Caracteristica c);
 	abstract protected int getCantidadCompetidores();
+	abstract public List<Competidor> getCompetidores();
 	abstract protected String getNombreParaArchivo();
 	
 	protected boolean esNombreValido(String name) {
